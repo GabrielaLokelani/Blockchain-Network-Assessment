@@ -1,0 +1,18 @@
+{
+  "name": "blockchain-network-assessment",
+  "version": "1.0.0",
+  "description": "Welcome to my personal practical project where I will be building my own blockchain network!  In this project I will Implement a fully-functional blockchain network consisting of: Nodes (peer-to-peer communication, blocks, transactions, consensus, REST API), Mining software (proof-of-work), Wallet software (handle private keys + sign and send transactions),  Faucet app (to request free coins) and a  Block Explorer app (to browse the blocks and transactions).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "crypto-js": "^4.1.1",
+    "express": "^4.18.2",
+    "ws": "^8.11.0"
+  }
+}
