@@ -29,6 +29,18 @@ class Block {
     }
 }
 
+// TRANSACTION (*** simplified for now, add extra params later ***)
+class Transaction {
+    constructor(from, to, value, fee, dateCreated, data) {
+        this.from = from;
+        this.to = to;
+        this.value = value;
+        this.fee = fee;
+        this.dateCreated = dateCreated;
+        this.data = data;
+    }
+}
+
 
 // CREATE GENESIS BLOCK MANUALLY
 function createGenesisBlock() {
@@ -43,20 +55,32 @@ function getLatestBlock() {
     return blockchain[blockchain.length - 1];
 }
 
-function calculateHash(index, data, difficulty, minedBy, nonce, timestamp, previousBlockHash) {
-    return CryptoJS.SHA256(index + JSON.stringify(data) + difficulty + minedBy + nonce + timestamp + previousBlockHash).toString();
+function calculateHash(index, data, minedBy, nonce, timestamp, previousBlockHash) {
+    return CryptoJS.SHA256(index + JSON.stringify(data) + minedBy + nonce + timestamp + previousBlockHash).toString();
 }
 
 function calculateHashForBlock(block) {
-    return calculateHash(block.index, block.data, block.difficulty, block.minedBy, block.nonce, block.timestamp, block.previousBlockHash);
+    return calculateHash(block.index, block.data, block.minedBy, block.nonce, block.timestamp, block.previousBlockHash);
 }
 
-// GENERATE THE NEXT BLOCK
-function generateNextBlock(blockData, difficulty, minedBy, nonce) {
+// MINE THE NEXT BLOCK
+function mineNextBlock(blockData, difficulty, minedBy) {
     var previousBlock = getLatestBlock();
     var newIndex = previousBlock.index + 1;
-    var newTimestamp = new Date().getTime() / 1000;
-    var nextHash = calculateHash(newIndex, blockData, difficulty, minedBy, nonce, newTimestamp, previousBlock.blockHash);
+    var nonce = 0;
+    var newTimestamp = new Date();
+    var nextHash = calculateHash(newIndex, blockData, minedBy, nonce, newTimestamp, previousBlock.blockHash);
+    console.log('\n MINING IN PROGRESS...')
+    while (nextHash.substring(0, difficulty) !== Array(difficulty + 1).join('0')) {
+        nonce++;
+        var newTimestamp = new Date();
+        var nextHash = calculateHash(newIndex, blockData, minedBy, nonce, newTimestamp, previousBlock.blockHash);
+
+        console.log('\'index\':' + newIndex + ',\'perviousHash\':' + previousBlock.blockHash + 
+                    '\'timestamp\':' + newTimestamp + '\'data\':' + blockData + 
+                    ',\x1b[33mhash: ' + nextHash + ' \x1b[0m,' + '\'difficulty\':' + difficulty + 
+                    ',\x1b[33mnonce: ' + nonce + ' \x1b[0m ');        
+    }
     return new Block(newIndex, blockData, difficulty, minedBy, nextHash, nonce, newTimestamp, previousBlock.blockHash)
 }
 
@@ -124,7 +148,11 @@ function testApplication() {
     // ADD BLOCK TESTING
     console.log('blockchain before addBlock() execution: ');
     showBlockchain(blockchain);
-    addBlock(generateNextBlock('testing new block data', 4, "0000000000000000000000000000000000000000", 0));
+    console.log("Mining block 1...");
+    addBlock(mineNextBlock('testing new block data', 2, "0000000000000000000000000000000000000000"));
+    console.log('\n');
+    console.log("Mining block 2...");
+    addBlock(mineNextBlock('testing new block data... again!', 2, "0000000000000000000000000000000000000000"));
     console.log('\n');
     console.log('Blockchain after the addBlock() execution: ');
     showBlockchain(blockchain)
