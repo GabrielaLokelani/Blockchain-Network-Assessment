@@ -83,6 +83,32 @@ function addBlock(newBlock) {
     }
 }
 
+// SEE IF THE CHAIN IS VALID
+function isValidBlockchain(blockchain) {
+    if (JSON.stringify(blockchain[0]) !== JSON.stringify(createGenesisBlock())) {
+        return false;
+    }
+    let tempBlocks = [blockchain[0]];
+    for (let i = 1; i < blockchain.length; i++) {
+        if (isValidNewBlock(blockchain[i], tempBlocks[i - 1])) {
+            tempBlocks.push(blockchain[i]);
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
+// REPLACE THE INVALID IMPOSTER CHAIN!
+function replaceImposterChain(newBlocks) {
+    if (isValidBlockchain(newBlocks) && newBlocks.length > blockchain.length) {
+        console.log('The recieved blockchain is valid! Replacing the current chain with the recieved chain.');
+        blockchain = newBlocks;
+    } else {
+        console.log('Recieved chain is not valid!');
+    }
+}
+
 
 // TEST APPLICATIONS FUNCTIONALITY
 function testApplication() {
