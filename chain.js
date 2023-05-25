@@ -6,10 +6,11 @@ const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 
 
-// CONSTRUCT THE BLOCK
+// CONSTRUCT THE BLOCK (if broken, take out transactions)
 class Block {
-    constructor(index, data, difficulty, minedBy, blockDataHash, nonce, timestamp, previousBlockHash) {
+    constructor(index, transactions, data, difficulty, minedBy, blockDataHash, nonce, timestamp, previousBlockHash) {
         this.index = index;
+        this.transactions = transactions;
         this.data = data;
         this.difficulty = difficulty;
         this.minedBy = minedBy.toString();
@@ -76,7 +77,7 @@ function mineNextBlock(blockData, difficulty, minedBy) {
         var newTimestamp = new Date();
         var nextHash = calculateHash(newIndex, blockData, minedBy, nonce, newTimestamp, previousBlock.blockHash);
 
-        console.log('\'index\':' + newIndex + ',\'perviousHash\':' + previousBlock.blockHash + 
+        console.log('\'index\':' + newIndex + ',\'previousHash\':' + previousBlock.blockHash + 
                     '\'timestamp\':' + newTimestamp + '\'data\':' + blockData + 
                     ',\x1b[33mhash: ' + nextHash + ' \x1b[0m,' + '\'difficulty\':' + difficulty + 
                     ',\x1b[33mnonce: ' + nonce + ' \x1b[0m ');        
