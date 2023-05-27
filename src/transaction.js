@@ -36,18 +36,17 @@ export default class Transaction {
         // signature to DER format
         this.signature = sign.toDER('hex');
 
-        console.log('signature: ' + this.signature);
-        // console.log('signature: ' + sign.toDER('hex'));
+        // console.log('signature: ' + this.signature);
     }
 
     isValid() {
-        // The miner fee transaction fromAddress is empty, verification cannot be completed.
+        // if miner fee transaction fromAddress is empty, verification cannot be completed.
         if (this.from === null) return true;
         // Determine if the signature exists
         if (!this.signature || this.signature.length === 0) {
             throw new Error('No signature in this transaction');
         }
-        // Transcode fromAddress to get the public key (this process is reversible, as it is just a format conversion process.)
+        // fromAddress to get the public key (this process is reversible, as it is just a format conversion process.)
         const publicKey = ec.keyFromPublic(this.from, 'hex');
         // Use the public key to verify if the signature is correct, or more specifically if the transaction was actually initiated from fromAddress.
         return publicKey.verify(this.calculateTransactionHash(), this.signature);

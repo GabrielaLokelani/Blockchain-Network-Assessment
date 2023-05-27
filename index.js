@@ -12,7 +12,7 @@ const jakeWallet = createWallet();
 console.log("is myWallet privateKey equal to publicKey?", validateWallet(myWallet.privateKey, myWallet.publicKey));
 
 // init transaction and send 50 coins to jakes wallet
-const txn1 = new Transaction(myWallet.publicKey, jakeWallet.publicKey, 50, this.miningReward, Date.now(), 'first transaction data!');
+const txn1 = new Transaction(myWallet.publicKey, jakeWallet.publicKey, 50, 20, Date.now(), 'first transaction data!');
 
 // sign 
 txn1.signTransaction(myWallet.keyPair);
@@ -23,28 +23,31 @@ console.log('Starting up miner for block 1... ');
 MIEWCOIN_BLOCKCHAIN.minePendingTransactions(myWallet.publicKey);
 
 // add more txns and blocks so smale chain will be 3 blocks in height
-const txn2 = new Transaction(myWallet.publicKey, jakeWallet.publicKey, 75, this.miningReward, Date.now(), 'second transaction data!');
+const txn2 = new Transaction(myWallet.publicKey, jakeWallet.publicKey, 75, 15, Date.now(), 'second transaction data!');
 txn2.signTransaction(myWallet.keyPair);
 MIEWCOIN_BLOCKCHAIN.addTransaction(txn2);
 console.log('Starting up miner for block 2... ');
 MIEWCOIN_BLOCKCHAIN.minePendingTransactions(myWallet.publicKey);
 
-const txn3 = new Transaction(myWallet.publicKey, jakeWallet.publicKey, 100, this.miningReward, Date.now(), 'third transaction data!');
+const txn3 = new Transaction(myWallet.publicKey, jakeWallet.publicKey, 100, 10, Date.now(), 'third transaction data!');
 txn3.signTransaction(myWallet.keyPair);
 MIEWCOIN_BLOCKCHAIN.addTransaction(txn3);
 console.log('Starting up miner for block 3... ');
-MIEWCOIN_BLOCKCHAIN.minePendingTransactions(myWallet.publicKey);
+// show miner address instead of publicKey
+MIEWCOIN_BLOCKCHAIN.minePendingTransactions((myWallet.address).toString());
 
 // If the transfer is successful, the balance of Jake's account will be 50, 75, 100 added.
 console.log("Balance of Jake's account is: ", MIEWCOIN_BLOCKCHAIN.getBalanceOfAddress(jakeWallet.publicKey));
 
 // Test blockchain validation
 console.log("is the chain valid? " + MIEWCOIN_BLOCKCHAIN.isChainValid());
+console.log("is the chain valid 2? " + MIEWCOIN_BLOCKCHAIN.isValidChain());
 
-// We manually altered data in the blockchain
-MIEWCOIN_BLOCKCHAIN.chain[1].transactions[0].value = 200;
+// manually alter data in the blockchain
+MIEWCOIN_BLOCKCHAIN.chain[1].transactions[0].value = 800;
 
-console.log("is the chain still valid? " + MIEWCOIN_BLOCKCHAIN.isChainValid());
+// chainIsValid() needs to be fixed, not showing false 
+console.log("is the chain still valid? " + MIEWCOIN_BLOCKCHAIN.isValidChain());
 
 // We print the whole blockchain
-console.log(JSON.stringify(MIEWCOIN_BLOCKCHAIN, null, 4));
+console.log(JSON.stringify(MIEWCOIN_BLOCKCHAIN, null, 5));
