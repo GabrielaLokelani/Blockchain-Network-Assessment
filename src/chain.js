@@ -29,6 +29,10 @@ export default class BlockChain {
         return this.chain[this.chain - 1];
     }
 
+    returnChain() {
+        return this.chain;
+    }
+
     minePendingTransactions(miningRewardAddress) {
         const latestBlock = this.getBlock(this.getHeight());
         let newIndex = latestBlock.index + 1;
