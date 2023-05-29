@@ -10,6 +10,8 @@ import { initHttpServer } from "./src/node";
 import Transaction from "./src/transaction";
 import { createWallet, validateWallet } from "./src/wallet";
 
+initHttpServer();
+
 // // initialize the new blockcahin
 // const MIEWCOIN_BLOCKCHAIN = new BlockChain()
 
@@ -60,7 +62,7 @@ import { createWallet, validateWallet } from "./src/wallet";
 
 // console.log('testing return chain: ' + chain);
 
-// We print the whole blockchain
+// // We print the whole blockchain
 // console.log(JSON.stringify(MIEWCOIN_BLOCKCHAIN, null, 5));
 
-initHttpServer();
+

@@ -12,6 +12,7 @@ export function createWallet() {
     // console.log('here is your address: ' + address);
     // console.log('here is your publicKey: ' + publicKey);
     // console.log('here is your privateKey: ' + privateKey);
+    // console.log('here is your KeyPair: ' + JSON.stringify(keyPair));
 
     return {
         address,

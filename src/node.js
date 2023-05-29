@@ -25,6 +25,22 @@ let MessageType = {
 // initialize the new blockcahin
 const MIEWCOIN_BLOCKCHAIN = new BlockChain()
 
+const myWallet = createWallet();
+console.log('MyWallet: pubKey: ' + myWallet.publicKey + ' ' + 'privKey: ' + myWallet.privateKey);
+const jakeWallet = createWallet();
+console.log('JakeWallet: pubKey: ' + jakeWallet.publicKey + ' ' + 'privKey: ' + jakeWallet.privateKey);
+console.log("is myWallet privateKey equal to publicKey?", validateWallet(myWallet.privateKey, myWallet.publicKey));
+
+// init transaction and send 50 coins to jakes wallet
+const txn1 = new Transaction(myWallet.publicKey, jakeWallet.publicKey, 50, 20, Date.now(), 'first transaction data!');
+
+// sign 
+txn1.signTransaction(myWallet.keyPair);
+
+// submit txn
+MIEWCOIN_BLOCKCHAIN.addTransaction(txn1);
+
+// rest api logic for blocks, createWallet, pendingTransactions, minePendingTransactions, peers, still fixing sendTransaction
 export function initHttpServer() {
     let app = express();
     app.use(bodyParser.json());
@@ -32,49 +48,45 @@ export function initHttpServer() {
     // get all blocks in the blockchain
     app.get('/blocks', (req, res) => res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN)));
 
-    app.post('mineBlock', (req, res) => {
-        let newBlock = new Block(req.body.data);
-        res.send()
-    })
-
+    // create a new wallet and return the public and private keys
     app.post('/createWallet', (req, res) => {
-        let myWallet = createWallet();
-        console.log('New wallet! ' + 'address: ' + myWallet.address + 'pubKey: ' + myWallet.publicKey + 'privKey: ' + myWallet.privateKey);
-        res.send()
+        let newWallet = createWallet();
+        console.log('testing new console.log');
+        console.log('New wallet! ' + 'address: ' + newWallet.address + ' pubKey: ' + newWallet.publicKey + ' privKey: ' + newWallet.privateKey + ' ' + 'keyPair: ' + newWallet.keyPair);
+        res.send({ "pubKey": newWallet.publicKey, "privKey": newWallet.privateKey });
     });
 
-    app.post('/addTransaction', (req, res) => {
+    // get all pending transactions
+    app.get('/transactions/pending', (req, res) => {
+        res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.pendingTransactions))
+    })
+
+    app.post('/transactions/send', (req, res) => {
         // init transaction and send 50 coins to jakes wallet
-        const txn1 = new Transaction(req.body.data);
+        const newTXN = new Transaction(req.body);
 
         // sign 
-        txn1.signTransaction(req.body.data);
+        // issue with signing, for some reason thinks it is foreign wallet
+        newTXN.signTransaction(myWallet.keyPair);
 
         // submit txn
-        MIEWCOIN_BLOCKCHAIN.addTransaction(txn1);
+        MIEWCOIN_BLOCKCHAIN.addTransaction(newTXN);
         res.send();
     });
 
     // mine pending txns to mine the next block
     app.post('/minePendingTransactions', (req, res) => {
-                // init wallets
-    const myWallet = createWallet();
-    const jakeWallet = createWallet();
-    console.log("is myWallet privateKey equal to publicKey?", validateWallet(myWallet.privateKey, myWallet.publicKey));
-
-    // init transaction and send 50 coins to jakes wallet
-    const txn1 = new Transaction(myWallet.publicKey, jakeWallet.publicKey, 50, 20, Date.now(), 'first transaction data!');
-
-    // sign 
-    txn1.signTransaction(myWallet.keyPair);
-
-    // submit txn
-    MIEWCOIN_BLOCKCHAIN.addTransaction(txn1);
-    console.log('Starting up miner for block 1... ');
-    MIEWCOIN_BLOCKCHAIN.minePendingTransactions(myWallet.publicKey);
+    // MIEWCOIN_BLOCKCHAIN.minePendingTransactions(myWallet.publicKey);
+    MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body);
     res.send()
     });
 
+    app.post('/resetChain', (req, res) => {
+        const MIEWCOIN_BLOCKCHAIN = new BlockChain();
+        res.send();
+    })
+
+    // get array of connected peers
     app.get('/peers', (req, res) => {
         res.send(sockets.map(s => s._socket.remoteAddress + ':' + s._socket.remotePort));
     });
