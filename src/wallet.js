@@ -7,7 +7,7 @@ export function createWallet() {
     const keyPair = ec.genKeyPair();
     const publicKey = keyPair.getPublic('hex');
     const privateKey = keyPair.getPrivate('hex');
-    const address = RIPEMD160(publicKey)
+    const address = RIPEMD160(publicKey).toString()
 
     // console.log('here is your address: ' + address);
     // console.log('here is your publicKey: ' + publicKey);
