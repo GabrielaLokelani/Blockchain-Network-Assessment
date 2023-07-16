@@ -29,14 +29,20 @@ export default class Block {
         return true;
     }
 
-    mineBlock(difficulty) {
+    mineBlock(difficulty, newBlock) {
         while (this.blockHash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
             this.nonce++;
             this.blockHash = this.calculateBlockHash();
         }
+        const newBlockHash = this.calculateBlockHash(newBlock);
+        console.log("supposed new blocks hash: " + newBlockHash);
 
         console.log("Block mined, nonce: " + this.nonce + ", hash: " + this.blockHash);
     }
+}
+
+export function calculateBlockHash(newBlock) {
+    return CryptoJS.SHA256(newBlock.blockDataHash + newBlock.nonce).toString();
 }
 
 
@@ -60,3 +66,4 @@ export default class Block {
 // ● prevBlockHash – The previous block hash
 // ● blockDataHash – The hash of the data in the block
 // ● blockHash – the hash of the blockDataHash plus the nonce
+

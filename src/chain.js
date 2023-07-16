@@ -1,5 +1,8 @@
 import Block from './block';
+import { calculateBlockHash } from './block';
+import { MIEWCOIN_BLOCKCHAIN } from '../index'
 import Transaction from './transaction';
+import { broadcast, responseLatestMsg } from "./node";
 // IMPORT RELEVANT LIBRARIES
 const CryptoJS = require('crypto-js');
 
@@ -12,7 +15,7 @@ export default class BlockChain {
     }
 
     creationOfGenesisBlock() {
-        return new Block(0, [], "0000000000000000000000000000000000000000", Date.now(), '')
+        return new Block(0, [], "0000000000000000000000000000000000000000", 7/17/2023, '')
     }
 
     // The method to get the current height of the chain (the latest added block in the chain length).
@@ -37,13 +40,13 @@ export default class BlockChain {
         const latestBlock = this.getBlock(this.getHeight());
         let newIndex = latestBlock.index + 1;
 
-        let block = new Block(newIndex, this.pendingTransactions, miningRewardAddress, Date.now(), latestBlock.blockHash);
+        let block = new Block(newIndex, this.pendingTransactions, JSON.stringify(miningRewardAddress), Date.now(), latestBlock.blockHash);
 
-        block.mineBlock(this.difficulty);
+        block.mineBlock(this.difficulty, block);
         console.log('Block was successfully mined!');
 
-        this.addBlock(block);
-        // this.chain.push(block)
+        // this.addBlock(block);
+        MIEWCOIN_BLOCKCHAIN.addBlock(block);
 
         // Put the miner fee transaction into pendingTransactions for the next processing operation. The miner fee transaction is characterized by the source account being empty.
         this.pendingTransactions = [
@@ -51,6 +54,8 @@ export default class BlockChain {
             // new Transaction(null, miningRewardAddress, 5, this.miningReward, Date.now(), "transaction data")
         ];
 
+        return block;
+        // return new Block(block.index, block.transactions, nextTimestamp, blockData, nextHash, difficulty, nonce);
     }
 
     addTransaction(transaction) {
@@ -112,7 +117,7 @@ export default class BlockChain {
         } else if (previousBlock.blockHash !== newBlock.previousBlockHash) {
             console.log('invalid previous Hash');
             return false;
-        } else if (newBlock.calculateBlockHash() !== newBlock.blockHash) {
+        } else if (calculateBlockHash(newBlock) !== newBlock.blockHash) {
             // console.log(typeof (newBlock.blockHash) + ' ' + typeof calculateBlockHash(newBlock));
             // console.log('invalid hash: ' + calculateBlockHash(newBlock) + ' ' + newBlock.blockHash);
             return false;
@@ -152,7 +157,7 @@ export default class BlockChain {
         if (isValidChain(newBlocks) && newBlocks.length > this.chain.length) {
             console.log('recieved blockchain is valid. Replacing current blockchain with recieved blockchain');
             this.chain = newBlocks;
-            // broadcast(responseLatestMsg());
+            broadcast(responseLatestMsg());
         } else {
             console.log('recieved blockchain is invalid');
         }            
