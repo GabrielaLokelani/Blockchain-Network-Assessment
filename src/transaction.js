@@ -3,6 +3,7 @@
 const CryptoJS = require('crypto-js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
+import { keyPairFromPriv } from "./wallet";
 
 // (*** simplified for now, add extra params later ***)
 export default class Transaction {
@@ -20,12 +21,21 @@ export default class Transaction {
         return CryptoJS.SHA256(this.from + this.to + this.value + this.fee + this.dateCreated + this.data + this.senderPubKey).toString();
     }
 
-    signTransaction(signingKey) {
+    signTransaction(privateKey) {
         // check miner tx is valid
         if (this.from === null) return true;
 
+        const signingKey = keyPairFromPriv(privateKey);
+        // JSON.stringify(signingKey);
+        console.log("sign txn here is the keypair from private: " + JSON.stringify(signingKey));
+        // ISSUE **** when signing through postman the privatekey is left out in the keypair that is generated but works for other txn1
+
+
         // verify source account is person's address
-        if (signingKey.getPublic('hex') !== this.senderPubKey) {
+        const publicKey = signingKey.getPublic('hex');
+        console.log("public key from signingkey: " + publicKey);
+
+        if (publicKey !== this.senderPubKey) {
             throw new Error('Sorry, you cannot sign transactions from a foreign wallet!');
         }
 
@@ -36,8 +46,7 @@ export default class Transaction {
 
         // signature to DER format
         this.signature = sign.toDER('hex');
-
-        // console.log('signature: ' + this.signature);
+        console.log('signature: ' + this.signature);
     }
 
     isValid() {

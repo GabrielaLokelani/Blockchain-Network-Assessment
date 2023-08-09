@@ -30,3 +30,9 @@ export function validateWallet(privateKey, publicKey) {
 
     return publicKeyFromPrivate === publicKey;
 }
+
+export function keyPairFromPriv(privKey) {
+    const key = ec.keyFromPrivate(privKey);
+    // console.log("here is the supposed generated key from private: " + JSON.stringify(key));
+    return key;
+}

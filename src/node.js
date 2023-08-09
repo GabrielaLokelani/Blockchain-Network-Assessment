@@ -9,7 +9,7 @@ const bodyParser = require('body-parser');
 
 import BlockChain from "./chain";
 import Transaction from "./transaction";
-import { createWallet, validateWallet } from "./wallet";
+import { createWallet, validateWallet, keyPairFromPriv } from "./wallet";
 import { MIEWCOIN_BLOCKCHAIN } from '../index'
 
 const http_port = process.env.HTTP_PORT || 5555;
@@ -38,16 +38,18 @@ export function initHttpServer() {
     app.use(bodyParser.json());
 
     const myWallet = createWallet();
-    console.log('MyWallet: address: ' + myWallet.address + '\n' + 'myWallet publicKey: ' + myWallet.publicKey + '\n' + 'myWaalet privateKey: ' + myWallet.privateKey + '\n' + 'myWaalet keypair:' + myWallet.keyPair);
+    console.log('MyWallet: address: ' + myWallet.address + '\n' + 'myWallet publicKey: ' + myWallet.publicKey + '\n' + 'myWalet privateKey: ' + myWallet.privateKey);
     const jakeWallet = createWallet();
-    console.log('jakeWallet: address: ' + jakeWallet.address + '\n' + 'jakeWallet publicKey: ' + jakeWallet.publicKey + '\n' + 'myWaalet privateKey: ' + jakeWallet.privateKey + '\n' + 'myWaalet keypair:' + jakeWallet.keyPair);
-    console.log("is myWallet privateKey equal to publicKey?", validateWallet(jakeWallet.privateKey, jakeWallet.publicKey));
+    console.log('jakeWallet: address: ' + jakeWallet.address + '\n' + 'jakeWallet publicKey: ' + jakeWallet.publicKey + '\n' + 'jakeWallet privateKey: ' + jakeWallet.privateKey);
+    // console.log("is myWallet privateKey equal to publicKey?", validateWallet(jakeWallet.privateKey, jakeWallet.publicKey));
+    // console.log('jakeWallet: address: ' + jakeWallet.address + '\n' + 'jakeWallet publicKey: ' + jakeWallet.publicKey + '\n' + 'jakeWallet privateKey: ' + jakeWallet.privateKey + '\n' + 'jakeWallet keypair:' + JSON.stringify(jakeWallet.keyPair));
 
     // init transaction and send 50 coins to jakes wallet
     const txn1 = new Transaction(myWallet.address, jakeWallet.address, 50, 20, Date.now(), 'first transaction data!', myWallet.publicKey);
 
     // sign 
-    txn1.signTransaction(myWallet.keyPair);
+    txn1.signTransaction(myWallet.privateKey);
+    console.log("testing after first txn signing: " + myWallet.privateKey);
 
     // submit txn
     MIEWCOIN_BLOCKCHAIN.addTransaction(txn1);
@@ -58,9 +60,7 @@ export function initHttpServer() {
     // create a new wallet and return the public and private keys
     app.post('/createWallet', (req, res) => {
         let newWallet = createWallet();
-        console.log('testing new console.log');
-        console.log('New wallet! ' + 'address: ' + newWallet.address + ' pubKey: ' + newWallet.publicKey + ' privKey: ' + newWallet.privateKey + ' ' + 'keyPair: ' + newWallet.keyPair);
-        res.send({ "pubKey": newWallet.publicKey, "privKey": newWallet.privateKey });
+        res.send({ 'address:': newWallet.address, "pubKey": newWallet.publicKey, "privKey": newWallet.privateKey});
     });
 
     // get all pending transactions
@@ -73,9 +73,9 @@ export function initHttpServer() {
         const newTXN = new Transaction(req.body.from, req.body.to, req.body.value, req.body.fee, Date.now(), req.body.data, req.body.senderPubKey);
 
         // sign 
-        // now need to make it so any wallet can sign not just tempm myWallet
-        newTXN.signTransaction(myWallet.keyPair);
-        console.log("signTransaction signkey NODE:" + myWallet.keyPair);
+        // now need to make it so any wallet can sign with private key
+        newTXN.signTransaction(req.body.privKey);
+        // console.log("signTransaction signkey NODE:" + req.body.privKey);
 
         // submit txn
         MIEWCOIN_BLOCKCHAIN.addTransaction(newTXN);
@@ -92,7 +92,7 @@ export function initHttpServer() {
     });
 
     app.post('/resetChain', (req, res) => {
-        MIEWCOIN_BLOCKCHAIN = [MIEWCOIN_BLOCKCHAIN.creationOfGenesisBlock()];
+        let MIEWCOIN_BLOCKCHAIN = [MIEWCOIN_BLOCKCHAIN.creationOfGenesisBlock()];
         res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN));
     })
 
