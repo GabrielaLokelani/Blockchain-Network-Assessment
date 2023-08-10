@@ -73,8 +73,7 @@ export function initHttpServer() {
         const newTXN = new Transaction(req.body.from, req.body.to, req.body.value, req.body.fee, Date.now(), req.body.data, req.body.senderPubKey);
 
         // sign 
-        // now need to make it so any wallet can sign with private key
-        newTXN.signTransaction(req.body.privKey);
+        newTXN.signTransaction(req.body.senderPrivKey);
         // console.log("signTransaction signkey NODE:" + req.body.privKey);
 
         // submit txn

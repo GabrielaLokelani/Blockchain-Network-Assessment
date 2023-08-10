@@ -7,7 +7,7 @@ import { keyPairFromPriv } from "./wallet";
 
 // (*** simplified for now, add extra params later ***)
 export default class Transaction {
-    constructor(from, to, value, fee, dateCreated, data, senderPubKey) {
+    constructor(from, to, value, fee, dateCreated, data, senderPubKey, senderPrivKey) {
         this.from = from;
         this.to = to;
         this.value = value;
@@ -15,6 +15,7 @@ export default class Transaction {
         this.dateCreated = dateCreated;
         this.data = data;
         this.senderPubKey = senderPubKey;
+        this.senderPrivKey = senderPrivKey;
     }
 
     calculateTransactionHash() {
