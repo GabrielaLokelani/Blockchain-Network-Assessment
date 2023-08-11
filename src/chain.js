@@ -40,7 +40,7 @@ export default class BlockChain {
         const latestBlock = this.getBlock(this.getHeight());
         let newIndex = latestBlock.index + 1;
 
-        let block = new Block(newIndex, this.pendingTransactions, JSON.stringify(miningRewardAddress), Date.now(), latestBlock.blockHash);
+        let block = new Block(newIndex, this.pendingTransactions, miningRewardAddress, Date.now(), latestBlock.blockHash);
 
         block.mineBlock(this.difficulty, block);
         console.log('Block was successfully mined!');

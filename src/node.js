@@ -84,13 +84,14 @@ export function initHttpServer() {
 
     // mine pending txns to mine the next block
     app.post('/minePendingTransactions', (req, res) => {
-    MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body);
+    MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body.miningRewardAddress);
     broadcast(responseLatestMsg());
     console.log('block added: ' + JSON.stringify(MIEWCOIN_BLOCKCHAIN))
     res.send()
     });
 
     app.post('/resetChain', (req, res) => {
+        // let MIEWCOIN_BLOCKCHAIN = new BlockChain();
         let MIEWCOIN_BLOCKCHAIN = [MIEWCOIN_BLOCKCHAIN.creationOfGenesisBlock()];
         res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN));
     })
