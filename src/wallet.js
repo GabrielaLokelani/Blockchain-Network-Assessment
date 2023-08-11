@@ -3,6 +3,7 @@ import { RIPEMD160 } from 'crypto-js';
 import { ec as EC } from 'elliptic';
 const ec = new EC('secp256k1');
 
+// will create a new wallet
 export function createWallet() {
     const keyPair = ec.genKeyPair();
     const publicKey = keyPair.getPublic('hex');
@@ -22,6 +23,7 @@ export function createWallet() {
     }
 }
 
+// validate wallet using public and private keys
 export function validateWallet(privateKey, publicKey) {
     const key = ec.keyFromPrivate(privateKey);
 
@@ -31,6 +33,7 @@ export function validateWallet(privateKey, publicKey) {
     return publicKeyFromPrivate === publicKey;
 }
 
+// extract the keypair from private key input
 export function keyPairFromPriv(privKey) {
     const key = ec.keyFromPrivate(privKey);
     // console.log("here is the supposed generated key from private: " + JSON.stringify(key));

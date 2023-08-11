@@ -22,15 +22,14 @@ export default class Transaction {
         return CryptoJS.SHA256(this.from + this.to + this.value + this.fee + this.dateCreated + this.data + this.senderPubKey).toString();
     }
 
+    // sign the transaction with the private key
     signTransaction(privateKey) {
         // check miner tx is valid
         if (this.from === null) return true;
 
+        // extract the keypair from private key
         const signingKey = keyPairFromPriv(privateKey);
-        // JSON.stringify(signingKey);
-        console.log("sign txn here is the keypair from private: " + JSON.stringify(signingKey));
-        // ISSUE **** when signing through postman the privatekey is left out in the keypair that is generated but works for other txn1
-
+        // console.log("sign txn here is the keypair from private: " + JSON.stringify(signingKey));
 
         // verify source account is person's address
         const publicKey = signingKey.getPublic('hex');

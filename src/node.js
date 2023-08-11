@@ -23,14 +23,6 @@ let MessageType = {
     RESPONSE_BLOCKCHAIN: 2
 };
 
-// initialize the new blockcahin
-// export function createChain() {
-//     const MIEWCOIN_BLOCKCHAIN = new BlockChain();
-//     return MIEWCOIN_BLOCKCHAIN;
-// }
-
-// createChain()
-
 
 // rest api logic for blocks, createWallet, pendingTransactions, minePendingTransactions, peers, still fixing sendTransaction
 export function initHttpServer() {
@@ -68,13 +60,13 @@ export function initHttpServer() {
         res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.pendingTransactions))
     })
 
+    // send a new transaction
     app.post('/transactions/send', (req, res) => {
-        // init transaction and send 50 coins to jakes wallet
+        // create a new transaction
         const newTXN = new Transaction(req.body.from, req.body.to, req.body.value, req.body.fee, Date.now(), req.body.data, req.body.senderPubKey);
 
         // sign 
         newTXN.signTransaction(req.body.senderPrivKey);
-        // console.log("signTransaction signkey NODE:" + req.body.privKey);
 
         // submit txn
         MIEWCOIN_BLOCKCHAIN.addTransaction(newTXN);
@@ -84,15 +76,16 @@ export function initHttpServer() {
 
     // mine pending txns to mine the next block
     app.post('/minePendingTransactions', (req, res) => {
-    MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body.miningRewardAddress);
-    broadcast(responseLatestMsg());
-    console.log('block added: ' + JSON.stringify(MIEWCOIN_BLOCKCHAIN))
-    res.send()
+        // submit miners address and init the miner
+        MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body.miningRewardAddress);
+        broadcast(responseLatestMsg());
+        console.log('block added: ' + JSON.stringify(MIEWCOIN_BLOCKCHAIN))
+        res.send()
     });
 
+    // reset the chain for testing purposes
     app.post('/resetChain', (req, res) => {
-        // let MIEWCOIN_BLOCKCHAIN = new BlockChain();
-        let MIEWCOIN_BLOCKCHAIN = [MIEWCOIN_BLOCKCHAIN.creationOfGenesisBlock()];
+        let MIEWCOIN_BLOCKCHAIN = new BlockChain();
         res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN));
     })
 
@@ -101,6 +94,7 @@ export function initHttpServer() {
         res.send(sockets.map(s => s._socket.remoteAddress + ':' + s._socket.remotePort));
     });
 
+    // add a peer to the network
     app.post('/addPeer', (req, res) => {
         connectToPeers([req.body.peer]);
         res.send();

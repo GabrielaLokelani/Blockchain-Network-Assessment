@@ -45,17 +45,12 @@ export default class BlockChain {
         block.mineBlock(this.difficulty, block);
         console.log('Block was successfully mined!');
 
-        // this.addBlock(block);
         MIEWCOIN_BLOCKCHAIN.addBlock(block);
 
-        // Put the miner fee transaction into pendingTransactions for the next processing operation. The miner fee transaction is characterized by the source account being empty.
-        this.pendingTransactions = [
-            // new Transaction(null, miningRewardAddress, this.miningReward, 0, '')
-            // new Transaction(null, miningRewardAddress, 5, this.miningReward, Date.now(), "transaction data")
-        ];
+        // Put the miner fee transaction into pendingTransactions for the next processing operation??? The miner fee transaction is characterized by the source account being empty.
+        this.pendingTransactions = [];
 
         return block;
-        // return new Block(block.index, block.transactions, nextTimestamp, blockData, nextHash, difficulty, nonce);
     }
 
     addTransaction(transaction) {

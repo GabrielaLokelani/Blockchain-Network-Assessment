@@ -29,6 +29,7 @@ export default class Block {
         return true;
     }
 
+    // mine the block POW taking in difficulty and newblock data
     mineBlock(difficulty, newBlock) {
         while (this.blockHash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
             this.nonce++;
@@ -41,6 +42,7 @@ export default class Block {
     }
 }
 
+// calculate the blockhash (block data hash + nonce) for outside the block class 
 export function calculateBlockHash(newBlock) {
     return CryptoJS.SHA256(newBlock.blockDataHash + newBlock.nonce).toString();
 }
