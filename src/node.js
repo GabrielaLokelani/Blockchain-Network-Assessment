@@ -49,6 +49,11 @@ export function initHttpServer() {
     // get all blocks in the blockchain
     app.get('/blocks', (req, res) => res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN)));
 
+    // get a specific block by its index *** currently having to use req.body.idex need to figure out how to do through http :)
+    app.get('/blocks/:index', (req, res) => {
+        res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.getBlock(req.body.index)));
+    });
+
     // create a new wallet and return the public and private keys
     app.post('/createWallet', (req, res) => {
         let newWallet = createWallet();
@@ -57,8 +62,20 @@ export function initHttpServer() {
 
     // get all pending transactions
     app.get('/transactions/pending', (req, res) => {
-        res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.pendingTransactions))
+        res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.pendingTransactions));
     })
+
+    // get all confirmed transactions 
+    app.get('/transactions/confirmed', (req, res) => {
+        const confirmedTXNs = MIEWCOIN_BLOCKCHAIN.getConfirmedTransactions();
+        res.send(confirmedTXNs);
+    });
+
+    // get specific transaction by its hash 
+    app.get('/transactions/:txnHash', (req, res) => {
+        const transaction = MIEWCOIN_BLOCKCHAIN.getTransactionByHash(req.body.txnHash);
+        res.send(transaction);
+    });
 
     // send a new transaction
     app.post('/transactions/send', (req, res) => {
@@ -74,16 +91,33 @@ export function initHttpServer() {
         res.send();
     });
 
+    // get all??? balances ** need to do **
+    app.get('/balances', (req, res) => {
+        res.send();
+    });
+
+    // get all transactions for a specific address ** need to change from req.body.address to use the http **
+    app.get('/address/:address/transactions', (req, res) => {
+        const transactions = MIEWCOIN_BLOCKCHAIN.getTransactionsForAddress(req.body.address);
+        res.send(transactions);
+    });
+
+    // get the balance for a specific address ** need to change from req.body.address to use the http **
+    app.get('/address/:address/balance', (req, res) => {
+        const balance = MIEWCOIN_BLOCKCHAIN.getBalanceOfAddress(req.body.address);
+        res.send(balance.toString());
+    });    
+
     // mine pending txns to mine the next block
     app.post('/minePendingTransactions', (req, res) => {
         // submit miners address and init the miner
         MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body.miningRewardAddress);
         broadcast(responseLatestMsg());
-        console.log('block added: ' + JSON.stringify(MIEWCOIN_BLOCKCHAIN))
-        res.send()
+        console.log('block added: ' + JSON.stringify(MIEWCOIN_BLOCKCHAIN));
+        res.send();
     });
 
-    // reset the chain for testing purposes
+    // reset the chain for debugging purposes
     app.post('/resetChain', (req, res) => {
         let MIEWCOIN_BLOCKCHAIN = new BlockChain();
         res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN));
@@ -95,8 +129,13 @@ export function initHttpServer() {
     });
 
     // add a peer to the network
-    app.post('/addPeer', (req, res) => {
+    app.post('/peers/connect', (req, res) => {
         connectToPeers([req.body.peer]);
+        res.send();
+    });
+
+    // notify peers of new block ** need to do **
+    app.post('/peers/notify-new-block', (req, res) => {
         res.send();
     });
 

@@ -66,6 +66,7 @@ export default class BlockChain {
         this.pendingTransactions.push(transaction)
     }
 
+    // get balance of an address
     getBalanceOfAddress(address) {
         let balance = 0;
         for (const block of this.chain) {
@@ -80,6 +81,56 @@ export default class BlockChain {
             }
         }
         return balance;
+    }
+
+    // get all confirmed transactions
+    getConfirmedTransactions() {
+        let listOfTXN = "";
+        for (const block of this.chain) {
+            if (block.transactions != null) {
+                listOfTXN = JSON.stringify(block.transactions);
+                // return block.transactions;
+            }
+        }
+        return listOfTXN;
+    }
+
+        // // get all confirmed transactions
+        // getConfirmedTransactions() {
+        //     let listOfTXN = [];
+        //     for (const block of this.chain) {
+        //         if (block.transactions != null) {
+        //             listOfTXN.push(block.transactions);
+        //             console.log("getting confirmed transactions");
+        //         }
+        //     }
+        //     return listOfTXN;
+        // }
+
+    // get all transactions for a specific address 
+    getTransactionsForAddress(address) {
+        let listOfTXN = "";
+        for (const block of this.chain) {
+            for (const transaction of block.transactions) {
+                if (transaction.from === address) {
+                    listOfTXN = JSON.stringify(transaction);
+                }
+            }
+        }
+        return listOfTXN;
+    }
+
+    // get specific transaction by its hash
+    getTransactionByHash(txnHash) {
+        let txn = "";
+        for (const block of this.chain) {
+            for (const transaction of block.transactions) {
+                if (transaction.transactionHash === txnHash) {
+                    txn = JSON.stringify(transaction);
+                }
+            }
+        }
+        return txn;
     }
 
     isChainValid() {

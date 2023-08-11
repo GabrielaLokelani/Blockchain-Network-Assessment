@@ -33,7 +33,7 @@ export default class Transaction {
 
         // verify source account is person's address
         const publicKey = signingKey.getPublic('hex');
-        console.log("public key from signingkey: " + publicKey);
+        // console.log("public key from signingkey: " + publicKey);
 
         if (publicKey !== this.senderPubKey) {
             throw new Error('Sorry, you cannot sign transactions from a foreign wallet!');
