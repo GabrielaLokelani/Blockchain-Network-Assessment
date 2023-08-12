@@ -49,6 +49,11 @@ export default class Transaction {
         console.log('signature: ' + this.signature);
     }
 
+    signRewardTransaction(privateKey) {
+        this.transactionHash = this.calculateTransactionHash();
+        this.signature = privateKey;
+    }
+
     isValid() {
         // if miner fee transaction fromAddress is empty, verification cannot be completed.
         if (this.from === null) return true;

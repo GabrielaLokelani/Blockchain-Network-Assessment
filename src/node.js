@@ -37,7 +37,7 @@ export function initHttpServer() {
     // console.log('jakeWallet: address: ' + jakeWallet.address + '\n' + 'jakeWallet publicKey: ' + jakeWallet.publicKey + '\n' + 'jakeWallet privateKey: ' + jakeWallet.privateKey + '\n' + 'jakeWallet keypair:' + JSON.stringify(jakeWallet.keyPair));
 
     // init transaction and send 50 coins to jakes wallet
-    // when testing with current code for mining reward sending, only works with added: , myWallet.privateKey after public key
+    // !! when testing with first code for mining reward sending, only works with added: , myWallet.privateKey after public key
     const txn1 = new Transaction(myWallet.address, jakeWallet.address, 50, 20, Date.now(), 'first transaction data!', myWallet.publicKey);
 
     // sign 
