@@ -50,6 +50,16 @@ export default class BlockChain {
         // Put the miner fee transaction into pendingTransactions for the next processing operation??? The miner fee transaction is characterized by the source account being empty.
         this.pendingTransactions = [];
 
+        // ?? should the minertxn be the fee from the txns being mined AND the reward and *** main issue rn is how to do all those txns and signing with privkeys
+        for (const txn of block.transactions) {
+            // issue with getting paid with the mining fee and mining reward bc it takes extra coins from sender who should only pay fee, "00000..." should pay that reward
+            const minerTXN = new Transaction(txn.from, miningRewardAddress, this.miningReward + txn.fee, 10, Date.now(), "mining reward!", txn.senderPubKey);
+            console.log("here is the new supposed txn for the miners reward:    " + JSON.stringify(minerTXN));
+            minerTXN.signTransaction(txn.senderPrivKey);
+            console.log("here is the minerTXN senders privkey:   " + txn.senderPrivKey);
+            MIEWCOIN_BLOCKCHAIN.addTransaction(minerTXN);
+        }
+
         return block;
     }
 
@@ -73,6 +83,7 @@ export default class BlockChain {
             for (const transaction of block.transactions) {
                 if (transaction.from === address) {
                     balance -= transaction.value;
+                    balance -= transaction.fee;
                 }
 
                 if (transaction.to === address) {
@@ -94,18 +105,6 @@ export default class BlockChain {
         }
         return listOfTXN;
     }
-
-        // // get all confirmed transactions
-        // getConfirmedTransactions() {
-        //     let listOfTXN = [];
-        //     for (const block of this.chain) {
-        //         if (block.transactions != null) {
-        //             listOfTXN.push(block.transactions);
-        //             console.log("getting confirmed transactions");
-        //         }
-        //     }
-        //     return listOfTXN;
-        // }
 
     // get all transactions for a specific address 
     getTransactionsForAddress(address) {

@@ -6,16 +6,17 @@ export default class Block {
     constructor(index, transactions, minedBy, dateCreated, previousBlockHash) {
         this.index = index;
         this.transactions = transactions;
-        this.minedBy = minedBy.toString();
-        this.dateCreated = dateCreated;
+        this.difficulty = 2;
         this.previousBlockHash = previousBlockHash.toString();
-        this.nonce = 0;
+        this.minedBy = minedBy.toString();
         this.blockDataHash = this.calculateBlockDataHash();
+        this.nonce = 0;
+        this.dateCreated = dateCreated;
         this.blockHash = this.calculateBlockHash();
     }
 
     calculateBlockDataHash() {
-        return CryptoJS.SHA256(this.index + JSON.stringify(this.transactions) + this.minedBy + this.dateCreated + this.previousBlockHash + this.nonce).toString();
+        return CryptoJS.SHA256(this.index + JSON.stringify(this.transactions) + this.difficulty + this.previousBlockHash + this.minedBy).toString();
     }
 
     calculateBlockHash() {
@@ -51,25 +52,4 @@ export function calculateBlockHash(newBlock) {
     return CryptoJS.SHA256(newBlock.blockDataHash + newBlock.nonce).toString();
 }
 
-
-
-// ● Index – The index of the block
-// ● Transactions – The transactions that are included in the block 
-    // o From – Address of the sender 
-    // o To – Address of the receiver 
-    // o Value – the amount of money 
-    // o Fee – the fee for the transaction
-    // o dateCreated – the timestamp of the transaction
-    // o data – Some additional data, if you want to add some message to the transaction
-    // o senderPubKey – The public key of the sender 
-    // o senderSignature – The signature of the sender
-    // o minedInBlockIndex – the block index in which the transaction is mined
-    // o transferSuccessful – true if the transaction is mined, false if it has not mined
-// ● Difficulty – the difficulty of the block
-// ● minedBy – the miner’s address
-// ● nonce – The proof for the block, (nonce + blockHash) need to hash to a value below the difficulty value
-// ● dateCreated – The timestamp of the block
-// ● prevBlockHash – The previous block hash
-// ● blockDataHash – The hash of the data in the block
-// ● blockHash – the hash of the blockDataHash plus the nonce
 
