@@ -31,6 +31,10 @@ export default class Block {
 
     // mine the block POW taking in difficulty and newblock data
     mineBlock(difficulty, newBlock) {
+        for (const txn of this.transactions) {
+            txn.minedInBlockIndex = newBlock.index;
+            txn.transferSuccessful = true;
+        }
         while (this.blockHash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
             this.nonce++;
             this.blockHash = this.calculateBlockHash();
