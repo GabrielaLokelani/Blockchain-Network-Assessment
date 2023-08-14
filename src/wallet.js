@@ -6,9 +6,12 @@ const ec = new EC('secp256k1');
 // will create a new wallet
 export function createWallet() {
     const keyPair = ec.genKeyPair();
-    const publicKey = keyPair.getPublic('hex');
+    const publicKey = keyPair.getPublic();
+    // const publicKey = keyPair.getPublic('hex');
+    const publicKeyCompressed = publicKey.encodeCompressed("hex");
     const privateKey = keyPair.getPrivate('hex');
     const address = RIPEMD160(publicKey).toString()
+    const pubKey = keyPair.getPublic('hex');
 
     // console.log('here is your address: ' + address);
     // console.log('here is your publicKey: ' + publicKey);
@@ -17,7 +20,8 @@ export function createWallet() {
 
     return {
         address,
-        publicKey,
+        pubKey,
+        publicKeyCompressed,
         privateKey,
         keyPair
     }

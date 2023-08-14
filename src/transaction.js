@@ -23,13 +23,12 @@ export default class Transaction {
     }
 
     // sign the transaction with the private key
-    signTransaction(privateKey) {
+    signTransaction(privateKey, scrtMsg) {
         // check miner tx is valid
         if (this.from === null) return true;
 
         // extract the keypair from private key
         const signingKey = keyPairFromPriv(privateKey);
-        // console.log("sign txn here is the keypair from private: " + JSON.stringify(signingKey));
 
         // verify source account is person's address
         const publicKey = signingKey.getPublic('hex');
@@ -41,8 +40,11 @@ export default class Transaction {
 
         // sign tx hash w/ private key
         this.transactionHash = this.calculateTransactionHash();
+        const msg = CryptoJS.HmacSHA256(scrtMsg);
+        console.log("Here is the hashed secret msg:   " + msg);
 
-        const sign = signingKey.sign(this.transactionHash, 'base64');
+        // const sign = signingKey.sign(this.transactionHash, 'base64');
+        const sign = signingKey.sign(msg, privateKey, 'base64');
 
         // signature to DER format
         this.signature = sign.toDER('hex');

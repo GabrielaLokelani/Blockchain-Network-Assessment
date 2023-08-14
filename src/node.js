@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 
 import BlockChain from "./chain";
 import Transaction from "./transaction";
+import { createDate } from './block';
 import { createWallet, validateWallet, keyPairFromPriv } from "./wallet";
 import { MIEWCOIN_BLOCKCHAIN } from '../index'
 
@@ -30,20 +31,11 @@ export function initHttpServer() {
     app.use(bodyParser.json());
 
     const myWallet = createWallet();
-    console.log('MyWallet: address: ' + myWallet.address + '\n' + 'myWallet publicKey: ' + myWallet.publicKey + '\n' + 'myWalet privateKey: ' + myWallet.privateKey);
+    console.log('MyWallet: address: ' + myWallet.address + '\n' + 'myWallet publicKey: ' + myWallet.pubKey + '\n' + 'myWallet publicKeyCompressed: ' + myWallet.publicKeyCompressed + '\n' + 'myWalet privateKey: ' + myWallet.privateKey);
     const jakeWallet = createWallet();
-    console.log('jakeWallet: address: ' + jakeWallet.address + '\n' + 'jakeWallet publicKey: ' + jakeWallet.publicKey + '\n' + 'jakeWallet privateKey: ' + jakeWallet.privateKey);
+    console.log('jakeWallet: address: ' + jakeWallet.address + '\n' + 'jakeWallet publicKey: ' + jakeWallet.pubKey + '\n' +  'jakeWallet publicKeyCompressed: ' + jakeWallet.publicKeyCompressed + '\n' + 'jakeWallet privateKey: ' + jakeWallet.privateKey);
     // console.log("is myWallet privateKey equal to publicKey?", validateWallet(jakeWallet.privateKey, jakeWallet.publicKey));
-    // console.log('jakeWallet: address: ' + jakeWallet.address + '\n' + 'jakeWallet publicKey: ' + jakeWallet.publicKey + '\n' + 'jakeWallet privateKey: ' + jakeWallet.privateKey + '\n' + 'jakeWallet keypair:' + JSON.stringify(jakeWallet.keyPair));
 
-    // init transaction and send 50 coins to jakes wallet
-    // !! when testing with first code for mining reward sending, only works with added: , myWallet.privateKey after public key
-    // const txn1 = new Transaction(myWallet.address, jakeWallet.address, 50, 20, Date.now(), 'first transaction data!', myWallet.publicKey);
-    // // sign 
-    // txn1.signTransaction(myWallet.privateKey);
-    // console.log("testing after first txn signing: " + myWallet.privateKey);
-    // // submit txn
-    // MIEWCOIN_BLOCKCHAIN.addTransaction(txn1);
 
     // get all blocks in the blockchain
     app.get('/blocks', (req, res) => res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN)));
@@ -80,7 +72,7 @@ export function initHttpServer() {
     app.post('/transactions/send', (req, res) => {
         // create a new transaction
         if (req.body.fee >= 10 && req.body.from != null && req.body.to != null) {
-            const newTXN = new Transaction(req.body.from, req.body.to, req.body.value, req.body.fee, Date.now(), req.body.data, req.body.senderPubKey);
+            const newTXN = new Transaction(req.body.from, req.body.to, req.body.value, req.body.fee, createDate(), req.body.data, req.body.senderPubKey);
             // sign 
             newTXN.signTransaction(req.body.senderPrivKey);
 

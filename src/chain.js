@@ -1,5 +1,5 @@
 import Block from './block';
-import { calculateBlockHash } from './block';
+import { calculateBlockHash, createDate } from './block';
 import { MIEWCOIN_BLOCKCHAIN } from '../index'
 import Transaction from './transaction';
 import { broadcast, responseLatestMsg } from "./node";
@@ -15,7 +15,7 @@ export default class BlockChain {
     }
 
     creationOfGenesisBlock() {
-        return new Block(0, [], "0000000000000000000000000000000000000000", '8/13/2023', '')
+        return new Block(0, [], "0000000000000000000000000000000000000000", createDate(), '')
     }
 
     // The method to get the current height of the chain (the latest added block in the chain length).
@@ -40,7 +40,7 @@ export default class BlockChain {
         const latestBlock = this.getBlock(this.getHeight());
         let newIndex = latestBlock.index + 1;
 
-        let block = new Block(newIndex, this.pendingTransactions, miningRewardAddress, Date.now(), latestBlock.blockHash);
+        let block = new Block(newIndex, this.pendingTransactions, miningRewardAddress, createDate(), latestBlock.blockHash);
 
         block.mineBlock(2, block);
         console.log('Block was successfully mined!');
@@ -66,7 +66,7 @@ export default class BlockChain {
         }
         console.log("total fees in this block:   " + totalFees);
         let totalReward = totalFees + this.miningReward;
-        const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, Date.now(), "mining reward!", "00000000000000000000000000000000000000000000000000");
+        const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "mining reward!", "00000000000000000000000000000000000000000000000000");
         minerTXN.signRewardTransaction("00000000000000000000000000000000000000000000000000");
         this.pendingTransactions.push(minerTXN);
 
@@ -99,6 +99,10 @@ export default class BlockChain {
 
                 if (transaction.to === address) {
                     balance += transaction.value;
+                }
+
+                if (transaction.from === "0000000000000000000000000000000000000000") {
+                    balance += transaction.fee;
                 }
             }
         }
@@ -174,8 +178,6 @@ export default class BlockChain {
             console.log('invalid previous Hash');
             return false;
         } else if (calculateBlockHash(newBlock) !== newBlock.blockHash) {
-            // console.log(typeof (newBlock.blockHash) + ' ' + typeof calculateBlockHash(newBlock));
-            // console.log('invalid hash: ' + calculateBlockHash(newBlock) + ' ' + newBlock.blockHash);
             return false;
         }
         return true;
@@ -189,7 +191,6 @@ export default class BlockChain {
         }
     }
 
-    // still need to get this function working
     isValidChain(blockchainToValidate) {
         if (JSON.stringify(blockchainToValidate[0]) !== JSON.stringify(this.creationOfGenesisBlock())) {
             return false;
@@ -216,41 +217,3 @@ export default class BlockChain {
     }
 
 }
-
-
-// ● Index – The index of the block
-// ● Transactions – The transactions that are included in the block 
-    // o From – Address of the sender 
-    // o To – Address of the receiver 
-    // o Value – the amount of money 
-    // o Fee – the fee for the transaction
-    // o dateCreated – the timestamp of the transaction
-    // o data – Some additional data, if you want to add some message to the transaction
-    // o senderPubKey – The public key of the sender 
-    // o senderSignature – The signature of the sender
-    // o minedInBlockIndex – the block index in which the transaction is mined
-    // o transferSuccessful – true if the transaction is mined, false if it has not mined
-// ● Difficulty – the difficulty of the block ** putting in chain file **
-// ● minedBy – the miner’s address
-// ● nonce – The proof for the block, (nonce + blockHash) need to hash to a value below the difficulty value
-// ● dateCreated – The timestamp of the block
-// ● prevBlockHash – The previous block hash
-// ● blockDataHash – The hash of the data in the block
-// ● blockHash – the hash of the blockDataHash plus the nonce
-
-
-// isValidChain(blockchainToValidate) {
-//     console.log
-//     if (JSON.stringify(blockchainToValidate[0]) !== JSON.stringify(this.creationOfGenesisBlock())) {
-//         return false;
-//     }
-//     var tempBlocks = [blockchainToValidate];
-//     for (let i = 1; i < blockchainToValidate.length; i++) {
-//         if (isValidNewBlock(blockchainToValidate[i], tempBlocks[i - 1])) {
-//             tempBlocks.push(blockchainToValidate[i]);
-//         } else {
-//             return false;
-//         }
-//     }
-//     return true;
-// }

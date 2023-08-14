@@ -52,4 +52,10 @@ export function calculateBlockHash(newBlock) {
     return CryptoJS.SHA256(newBlock.blockDataHash + newBlock.nonce).toString();
 }
 
+export function createDate() {
+    let date1 = new Date();
+    let date = date1.toISOString();
+    return date
+}
+
 
