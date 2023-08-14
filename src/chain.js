@@ -9,13 +9,13 @@ const CryptoJS = require('crypto-js');
 export default class BlockChain {
     constructor() {
         this.chain = [this.creationOfGenesisBlock()];
-        this.difficulty = 2;
+        // this.difficulty = 2;
         this.pendingTransactions = [];
-        this.miningReward = 100;
+        this.miningReward = 5000000;
     }
 
     creationOfGenesisBlock() {
-        return new Block(0, [], "0000000000000000000000000000000000000000", 7/17/2023, '')
+        return new Block(0, [], "0000000000000000000000000000000000000000", '8/13/2023', '')
     }
 
     // The method to get the current height of the chain (the latest added block in the chain length).
@@ -42,7 +42,7 @@ export default class BlockChain {
 
         let block = new Block(newIndex, this.pendingTransactions, miningRewardAddress, Date.now(), latestBlock.blockHash);
 
-        block.mineBlock(this.difficulty, block);
+        block.mineBlock(2, block);
         console.log('Block was successfully mined!');
 
         MIEWCOIN_BLOCKCHAIN.addBlock(block);
@@ -190,29 +190,29 @@ export default class BlockChain {
     }
 
     // still need to get this function working
-    isValidChain() {
-        let blockchainToValidate = [this.chain];
+    isValidChain(blockchainToValidate) {
+        console.log("See what JSON.stringify(blockchainToValidate[0]) is:   " + JSON.stringify(blockchainToValidate));
+        console.log("See what the genesis block in the test is:   " + JSON.stringify(this.creationOfGenesisBlock()));
         if (JSON.stringify(blockchainToValidate[0]) !== JSON.stringify(this.creationOfGenesisBlock())) {
-            console.log('did this fire')
             return false;
         }
-        console.log('did this fire %%%')
-        var tempBlocks = [blockchainToValidate];
+        var tempBlocks = [blockchainToValidate[0]];
         for (let i = 1; i < blockchainToValidate.length; i++) {
-            if (isValidNewBlock(blockchainToValidate[i], tempBlocks[i - 1])) {
+            if (this.isValidNewBlock(blockchainToValidate[i], tempBlocks[i - 1])) {
                 tempBlocks.push(blockchainToValidate[i]);
             } else {
                 return false;
             }
         }
-        console.log('did this fire $$')
         return true;
     }
 
     replaceChain(newBlocks) {
-        if (isValidChain(newBlocks) && newBlocks.length > this.chain.length) {
+        console.log("We have hit the replaceChain function");
+        console.log("here are the new blocks to replace the chain:   " + JSON.stringify(newBlocks));
+        if (this.isValidChain(newBlocks) && newBlocks.length > this.chain.length) {
             console.log('recieved blockchain is valid. Replacing current blockchain with recieved blockchain');
-            this.chain = newBlocks;
+            MIEWCOIN_BLOCKCHAIN = newBlocks;
             broadcast(responseLatestMsg());
         } else {
             console.log('recieved blockchain is invalid');
