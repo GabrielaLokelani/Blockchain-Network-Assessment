@@ -151,10 +151,20 @@ export let initP2PServer = () => {
 };
 
 let handleBlockchainResponse = (message) => {
-    let receivedBlocks = JSON.parse(message.data).sort(function(b1, b2) { return b1.index - b2.index});
-    // let receivedBlocks1 = JSON.parse(message.data);
-    // let receivedBlocks2 = [receivedBlocks1];
-    // let receivedBlocks = receivedBlocks2.sort(function(b1, b2) { return b1.index - b2.index});
+    let receivedBlocks = JSON.parse(message.data);
+    if (!receivedBlocks.chain) {
+        receivedBlocks.sort(function(a, b) { 
+            return a.index - b.index;
+        });
+    } else {
+        receivedBlocks = receivedBlocks.chain;
+        receivedBlocks.sort(function(a, b) { 
+            return a.index - b.index;
+        });
+    }
+    // let receivedBlocks = JSON.parse(message.data).sort(function(a, b) { 
+    //     return a.index - b.index;
+    // });
     let latestBlockReceived = receivedBlocks[receivedBlocks.length - 1];
     let latestBlockHeld = MIEWCOIN_BLOCKCHAIN.getBlock(MIEWCOIN_BLOCKCHAIN.getHeight());
     if (latestBlockReceived.index > latestBlockHeld.index) {
@@ -166,6 +176,7 @@ let handleBlockchainResponse = (message) => {
         } else if (receivedBlocks.length === 1) {
             console.log("We have to query the chain from our peer");
             broadcast(queryAllMsg());
+            // console.log("here are the received blocks:   " + JSON.stringify(receivedBlocks))
         } else {
             console.log("Received blockchain is longer than current blockchain");
             MIEWCOIN_BLOCKCHAIN.replaceChain(receivedBlocks);

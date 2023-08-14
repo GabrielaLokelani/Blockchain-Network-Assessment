@@ -191,8 +191,6 @@ export default class BlockChain {
 
     // still need to get this function working
     isValidChain(blockchainToValidate) {
-        console.log("See what JSON.stringify(blockchainToValidate[0]) is:   " + JSON.stringify(blockchainToValidate));
-        console.log("See what the genesis block in the test is:   " + JSON.stringify(this.creationOfGenesisBlock()));
         if (JSON.stringify(blockchainToValidate[0]) !== JSON.stringify(this.creationOfGenesisBlock())) {
             return false;
         }
@@ -208,11 +206,9 @@ export default class BlockChain {
     }
 
     replaceChain(newBlocks) {
-        console.log("We have hit the replaceChain function");
-        console.log("here are the new blocks to replace the chain:   " + JSON.stringify(newBlocks));
         if (this.isValidChain(newBlocks) && newBlocks.length > this.chain.length) {
             console.log('recieved blockchain is valid. Replacing current blockchain with recieved blockchain');
-            MIEWCOIN_BLOCKCHAIN = newBlocks;
+            this.chain = newBlocks;
             broadcast(responseLatestMsg());
         } else {
             console.log('recieved blockchain is invalid');
