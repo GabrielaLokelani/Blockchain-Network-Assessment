@@ -48,7 +48,7 @@ export function initHttpServer() {
     // create a new wallet and return the public and private keys
     app.post('/createWallet', (req, res) => {
         let newWallet = createWallet();
-        res.send({ 'address:': newWallet.address, "pubKey": newWallet.publicKey, "privKey": newWallet.privateKey});
+        res.send({ 'address:': newWallet.address, "pubKey": newWallet.pubKey, "publicKeyCompressed": newWallet.publicKeyCompressed, "privKey": newWallet.privateKey});
     });
 
     // get all pending transactions
@@ -74,7 +74,7 @@ export function initHttpServer() {
         if (req.body.fee >= 10 && req.body.from != null && req.body.to != null) {
             const newTXN = new Transaction(req.body.from, req.body.to, req.body.value, req.body.fee, createDate(), req.body.data, req.body.senderPubKey);
             // sign 
-            newTXN.signTransaction(req.body.senderPrivKey);
+            newTXN.signTransaction(req.body.senderPrivKey, req.body.scrtMsg);
 
             // submit txn
             MIEWCOIN_BLOCKCHAIN.addTransaction(newTXN);
@@ -129,6 +129,7 @@ export function initHttpServer() {
 
     // notify peers of new block ** need to do **
     app.post('/peers/notify-new-block', (req, res) => {
+        broadcast(responseLatestMsg());
         res.send();
     });
 

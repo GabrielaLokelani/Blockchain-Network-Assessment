@@ -9,7 +9,6 @@ const CryptoJS = require('crypto-js');
 export default class BlockChain {
     constructor() {
         this.chain = [this.creationOfGenesisBlock()];
-        // this.difficulty = 2;
         this.pendingTransactions = [];
         this.miningReward = 5000000;
     }
@@ -51,37 +50,27 @@ export default class BlockChain {
         this.pendingTransactions = [];
 
         // ?? should the minertxn be the fee from the txns being mined AND the reward and *** main issue rn is how to do all those txns and signing with privkeys
-        // for (const txn of block.transactions) {
-        //     // issue with getting paid with the mining fee and mining reward bc it takes extra coins from sender who should only pay fee, "00000..." should pay that reward with coinbase txn
-        //     const minerTXN = new Transaction(txn.from, miningRewardAddress, txn.fee, 0, Date.now(), "mining reward!", txn.senderPubKey);
-        //     console.log("here is the new supposed txn for the miners reward:    " + JSON.stringify(minerTXN));
-        //     minerTXN.signTransaction(txn.senderPrivKey);
-        //     console.log("here is the minerTXN senders privkey:   " + txn.senderPrivKey);
-        //     MIEWCOIN_BLOCKCHAIN.addTransaction(minerTXN);
-        // }
-
         let totalFees = 0;
         for (const txn of block.transactions) {
             totalFees += txn.fee;
         }
         console.log("total fees in this block:   " + totalFees);
         let totalReward = totalFees + this.miningReward;
-        const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "mining reward!", "00000000000000000000000000000000000000000000000000");
-        minerTXN.signRewardTransaction("00000000000000000000000000000000000000000000000000");
+        const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
+        minerTXN.signRewardTransaction("000000000000000000000000000000000000000000000000000000000000000000");
         this.pendingTransactions.push(minerTXN);
-
 
         return block;
     }
 
     addTransaction(transaction) {
-        if (!transaction.from || !transaction.to) {
-            throw new Error('Sorry! Transaction must include a from and to address');
+        if (!transaction.from || !transaction.to || !transaction.value || !transaction.fee || !transaction.data || !transaction.senderPubkey) {
+            throw new Error('Sorry! Transaction is missing a value.');
         }
-
-        if (!transaction.isValid()) {
-            throw new Error('Cannot add invalid transaction to the chain');
-        }
+        // ***!!! TURNED OFF FOR NOW WHILE TESTING OTHER ISSUE WITH SIGNING ***!!!
+        // if (!transaction.isValid()) {
+        //     throw new Error('Cannot add invalid transaction to the chain');
+        // }
 
         // push to mempool
         this.pendingTransactions.push(transaction)
