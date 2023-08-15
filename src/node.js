@@ -36,12 +36,15 @@ export function initHttpServer() {
     console.log('jakeWallet: address: ' + jakeWallet.address + '\n' + 'jakeWallet publicKey: ' + jakeWallet.pubKey + '\n' +  'jakeWallet publicKeyCompressed: ' + jakeWallet.publicKeyCompressed + '\n' + 'jakeWallet privateKey: ' + jakeWallet.privateKey);
     // console.log("is myWallet privateKey equal to publicKey?", validateWallet(jakeWallet.privateKey, jakeWallet.publicKey));
 
+    app.get('/', (req, res) => {
+        res.send("Welcome! Here is the latest block thats been added to the chain:" + JSON.stringify(MIEWCOIN_BLOCKCHAIN.getBlock(MIEWCOIN_BLOCKCHAIN.getHeight())))
+    })
 
     // get all blocks in the blockchain
     app.get('/blocks', (req, res) => res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN)));
 
     // get a specific block by its index *** currently having to use req.body.idex need to figure out how to do through http :)
-    app.get('/blocks/:index', (req, res) => {
+    app.get('/blocks/{:index}', (req, res) => {
         res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.getBlock(req.body.index)));
     });
 
