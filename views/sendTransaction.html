@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <title></title>
+    </head>
+    <body>
+        <div class="contrainer">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="/home">MiewCoin Blockchain Network</a>
+                    </div>
+                    <ul class="nav navbar-nav">
+                        <li><a href="/wallet">Wallet</a></li>
+                        <li><a href="/createWallet">Create Wallet</a></li>
+                        <li class="active"><a href="/transactions/send">Send Transaction</a></li>
+                        <li><a href="/address/:address/balance">Balance</a></li>
+                        <li><a href="/address/:address/transactions">Transactions</a></li>
+                    </ul>
+                </div>
+            </nav>
+                <div class="row">
+                    <div class="jumbotron col-sm-12">
+                        <div class="col-sm-12">
+                            <h1 class="display-3">Send and Sign a Transaction!</h1>
+                            <p class="lead">Fill in the form below to send Miewcoins!</p>
+                            <hr class="my-4">
+
+                            <form class="row" method="post" enctype="application/x-www-form-urlencoded">
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="form-group">
+                                        <label>From Address</label>
+                                        <input type="text" class="form-control" name="address" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>To Address</label>
+                                        <input type="text" id="fname" class="form-control" name="recipient" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Value</label>
+                                        <input type="text" class="form-control" name="value" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Fee</label>
+                                        <input type="text" class="form-control" name="fee" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Data</label>
+                                        <input type="text" class="form-control" name="data" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Public Key</label>
+                                        <input type="text" class="form-control" name="senderPubKey" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Private Key</label>
+                                        <input type="text" class="form-control" name="senderPrivKey" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Secret Message</label>
+                                        <input type="text" class="form-control" name="scrtMsg" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input type="submit" class="btn btn-defautl" value="Send">
+                                    </div>
+                                </div>
+                            </form>
+                        
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </body>
+</html>
