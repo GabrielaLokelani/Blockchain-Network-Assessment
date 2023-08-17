@@ -165,7 +165,7 @@ export function initHttpServer() {
 
 function drawView(res, view, data) {
     res.render('../views/' + view + '.html', data)
-  }
+}
 
 export let initP2PServer = () => {
     let server = new WebSocket.Server({port: p2p_port});

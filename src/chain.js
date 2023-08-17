@@ -4,7 +4,7 @@ import { calculateBlockHash, createDate } from './block';
 import { MIEWCOIN_BLOCKCHAIN } from '../index'
 import Transaction from './transaction';
 import { broadcast, responseLatestMsg } from "./node";
-import {faucetWallet} from "./faucet";
+import { faucetAddress } from "./faucetWallet";
 const CryptoJS = require('crypto-js');
 
 export default class BlockChain {
@@ -17,7 +17,7 @@ export default class BlockChain {
     creationOfGenesisBlock() {
         return new Block(0, [{
             "from": "0000000000000000000000000000000000000000",
-            "to": faucetWallet.address,
+            "to": faucetAddress,
             "value": 1000000000000, "fee": 0,
             "dateCreated": createDate(),
             "data": "genesis tx",
@@ -65,7 +65,6 @@ export default class BlockChain {
         for (const txn of block.transactions) {
             totalFees += txn.fee;
         }
-        console.log("total fees in this block:   " + totalFees);
         let totalReward = totalFees + this.miningReward;
         const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
         minerTXN.signRewardTransaction("000000000000000000000000000000000000000000000000000000000000000000");
@@ -78,7 +77,7 @@ export default class BlockChain {
         if (!transaction.from || !transaction.to || !transaction.value || !transaction.fee || !transaction.data || !transaction.senderPubkey) {
             throw new Error('Sorry! Transaction is missing a value.');
         }
-        // ***!!! TURNED OFF FOR NOW WHILE TESTING OTHER ISSUE WITH SIGNING ***!!!
+        // ***!!! TURNED OFF FOR NOW WHILE SIGNING WAS CHANGED ***!!!
         // if (!transaction.isValid()) {
         //     throw new Error('Cannot add invalid transaction to the chain');
         // }

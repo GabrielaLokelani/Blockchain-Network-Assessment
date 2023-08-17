@@ -4,7 +4,6 @@ const CryptoJS = require('crypto-js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 var crypto = require('crypto');
-// var ecdsa = require('ecdsa');
 import { keyPairFromPriv } from "./wallet";
 
 // (*** simplified for now, add extra params later ***)
@@ -43,7 +42,6 @@ export default class Transaction {
         // sign tx hash w/ private key amd secret msg hashed
         this.transactionHash = this.calculateTransactionHash();
         var msg = crypto.createHash("sha256").update(scrtMsg.toString()).digest();
-        // console.log("Here is the hashed secret msg hash:   " + msg);
 
         // const msg = CryptoJS.HmacSHA256(scrtMsg);
         // const sign = signingKey.sign(msg, privateKey, 'base64');
@@ -53,10 +51,9 @@ export default class Transaction {
 
         let hexToDecimal = (x) => ec.keyFromPrivate(x, "hex").getPrivate().toString(10);
         let pubKeyRecovered = ec.recoverPubKey(hexToDecimal(msg), signature, signature.recoveryParam, "hex");
-        console.log("Recovered pubKey:", pubKeyRecovered.encodeCompressed("hex"));
 
         var isValid = ec.verify(msg, signature, pubKeyRecovered);
-        console.log("Is this a valid signature?   " + isValid) //true
+        console.log("Is this a valid signature?   " + isValid) 
 
         // signature to DER format? ** currently not in DER format but can change with solution below :)
         // this.signature = signature.toDER('hex');
@@ -75,10 +72,6 @@ export default class Transaction {
         if (!this.signature || this.signature.length === 0) {
             throw new Error('No signature in this transaction');
         }
-        // // fromAddress to get the public key (this process is reversible, as it is just a format conversion process.)
-        // const publicKey = ec.keyFromPublic(this.senderPubKey, 'hex');
-        // // Use the public key to verify if the signature is correct, or more specifically if the transaction was actually initiated from fromAddress.
-        // return publicKey.verify(this.calculateTransactionHash(), this.signature);
 
         let hexToDecimal = (x) => ec.keyFromPrivate(x, "hex").getPrivate().toString(10);
         let pubKeyRecovered = ec.recoverPubKey(hexToDecimal(this.scrtMsg), this.signature, this.signature.recoveryParam, "hex");

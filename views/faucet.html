@@ -11,11 +11,11 @@
             <nav class="navbar navbar-default">
                 <div class="container-fluid">
                     <div class="navbar-header">
-                        <a class="navbar-brand" href="/home">MiewCoin Blockchain Network</a>
+                        <a class="navbar-brand" href="http://127.0.0.1:5555/home">MiewCoin Blockchain Network</a>
                     </div>
                     <ul class="nav navbar-nav">
-                        <li><a href="/blockExplorer">Block Explorer</a></li>
-                        <li><a href="/wallet">Wallet</a></li>
+                        <!-- <li><a href="/blockExplorer">Block Explorer</a></li>
+                        <li><a href="/wallet">Wallet</a></li> -->
                         <li class="active"><a href="/faucet">Faucet</a></li>
                     </ul>
                 </div>
@@ -38,7 +38,11 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Node URL:  <input type="text" class="form-control" name="nodeURL" id="nodeURL" required></label>
+                                        <label>Request Amount (less than 1000000):  <input type="number" class="form-control" name="requestAmount" id="requestAmount" required></label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Node URL:  <input type="text" class="form-control" name="nodeURL" id="nodeURL" ></label>
                                     </div>
 
                                     <div class="form-group">
@@ -47,8 +51,12 @@
                                 </div>
                             </form>
                         </div>
+                        <div class="col-sm-9">
+                            <img class="kittyFaucet" src="https://www.actioncat.com/images/catdrinkingfromfaucet3.gif" alt="kitty fountain"/>
+                        </div>
                     </div>
                 </div>
+                <div class="credits">Icon from www.actioncat.com </div>
         </div>
     </body>
 </html>

@@ -1,3 +1,11 @@
 .fit-picture {
     width: 250px;
   }
+  .credits {
+    display: none;
+  }
+  .kittyFaucet {
+    width: 50%;
+    height: 50%;
+    float: right;
+  }

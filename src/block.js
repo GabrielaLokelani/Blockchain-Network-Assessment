@@ -41,7 +41,6 @@ export default class Block {
             this.blockHash = this.calculateBlockHash();
         }
         const newBlockHash = this.calculateBlockHash(newBlock);
-        console.log("supposed new blocks hash: " + newBlockHash);
 
         console.log("Block mined, nonce: " + this.nonce + ", hash: " + this.blockHash);
     }

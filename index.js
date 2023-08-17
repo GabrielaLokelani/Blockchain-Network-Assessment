@@ -13,7 +13,7 @@ export const MIEWCOIN_BLOCKCHAIN = new BlockChain();
 initHttpServer();
 connectToPeers(initialPeers);
 initP2PServer();
-initFaucetServer();
+// initFaucetServer();
 
 
 // // initialize the new blockcahin
