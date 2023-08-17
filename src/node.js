@@ -12,7 +12,8 @@ import BlockChain from "./chain";
 import Transaction from "./transaction";
 import { createDate } from './block';
 import { createWallet, validateWallet, keyPairFromPriv } from "./wallet";
-import { MIEWCOIN_BLOCKCHAIN } from '../index'
+import { MIEWCOIN_BLOCKCHAIN } from '../index';
+import { faucetTransaction } from './faucet';
 
 const http_port = process.env.HTTP_PORT || 5555;
 const p2p_port = process.env.P2P_PORT || 6001;
@@ -49,10 +50,14 @@ export function initHttpServer() {
         res.render('../views/wallet.html');
     });
 
-    // get faucet page
-    app.get('/faucet', (req, res) => {
-        res.render('../views/faucet.html');
-    });
+    // // get faucet page
+    // app.get('/faucet', (req, res) => {
+    //     res.render('../views/faucet.html');
+    // });
+
+    // app.post('/faucet', (req, res) => {
+    //     faucetTransaction(req.body.toAddress, req.body.requestAmount);
+    // });
 
     // get all blocks in the blockchain
     app.get('/blocks', (req, res) => res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN)));
@@ -87,8 +92,7 @@ export function initHttpServer() {
 
     // get the send transaction page
     app.get('/transactions/send', (req, res) => {
-        console.log("testing if send txn fires");
-        res.render('../views/sendTransaction.html')
+        res.render('../views/sendTransaction.html');
     });
 
     // send a new transaction

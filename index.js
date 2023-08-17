@@ -7,13 +7,13 @@ const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 import BlockChain from "./src/chain";
 import { initHttpServer, connectToPeers, initP2PServer, initialPeers} from "./src/node";
-import Transaction from "./src/transaction";
-import { createWallet, validateWallet } from "./src/wallet";
+import { initFaucetServer } from "./src/faucet";
 
 export const MIEWCOIN_BLOCKCHAIN = new BlockChain();
 initHttpServer();
 connectToPeers(initialPeers);
 initP2PServer();
+initFaucetServer();
 
 
 // // initialize the new blockcahin

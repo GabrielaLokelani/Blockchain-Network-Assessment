@@ -1,9 +1,10 @@
+// IMPORT RELEVANT LIBRARIES, VARIABLES AND FUNCTIONS
 import Block from './block';
 import { calculateBlockHash, createDate } from './block';
 import { MIEWCOIN_BLOCKCHAIN } from '../index'
 import Transaction from './transaction';
 import { broadcast, responseLatestMsg } from "./node";
-// IMPORT RELEVANT LIBRARIES
+import {faucetWallet} from "./faucet";
 const CryptoJS = require('crypto-js');
 
 export default class BlockChain {
@@ -14,7 +15,17 @@ export default class BlockChain {
     }
 
     creationOfGenesisBlock() {
-        return new Block(0, [], "0000000000000000000000000000000000000000", createDate(), '')
+        return new Block(0, [{
+            "from": "0000000000000000000000000000000000000000",
+            "to": faucetWallet.address,
+            "value": 1000000000000, "fee": 0,
+            "dateCreated": createDate(),
+            "data": "genesis tx",
+            "senderPubKey": "000000000000000000000000000000000000000000000000000000000000000000",
+            "transactionDataHash": "8a684cb8491ee419e7d46a0fd24...ecc2",
+            "senderSignature": ["000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000000000000000000000000000"],
+            "minedInBlockIndex": 0, "transferSuccessful": true
+            }], "0000000000000000000000000000000000000000", createDate(), '')
     }
 
     // The method to get the current height of the chain (the latest added block in the chain length).

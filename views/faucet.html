@@ -2,8 +2,9 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <title></title>
+        <title>faucet</title>
     </head>
     <body>
         <div class="contrainer">
@@ -28,6 +29,23 @@
                             <hr class="my-4">
                         
                             <p>From here, you can request coins!</p>
+
+                            <form class="row" method="post" enctype="application/x-www-form-urlencoded">
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-group">
+                                        <label>Enter your Address:  <input type="text" class="form-control" name="toAddress" id="toAddress" required></label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Node URL:  <input type="text" class="form-control" name="nodeURL" id="nodeURL" required></label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary" value="Send">Send</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

@@ -2,8 +2,9 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <title></title>
+        <title>sendTransaction</title>
     </head>
     <body>
         <div class="contrainer">
@@ -24,55 +25,53 @@
                 <div class="row">
                     <div class="jumbotron col-sm-12">
                         <div class="col-sm-12">
-                            <h1 class="display-3">Send and Sign a Transaction!</h1>
+                            <h1 class="display-3">Create, Sign, and Send a Transaction!</h1>
+                            <hr class="my-4">
                             <p class="lead">Fill in the form below to send Miewcoins!</p>
                             <hr class="my-4">
 
                             <form class="row" method="post" enctype="application/x-www-form-urlencoded">
 
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-6 mb-3">
                                     <div class="form-group">
-                                        <label>From Address</label>
-                                        <input type="text" class="form-control" name="address" required>
+                                    <label>From Address:  <input type="text" class="form-control" name="from" id="from" required></label>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>To Address</label>
-                                        <input type="text" id="fname" class="form-control" name="recipient" required>
+                                        <label>To Address:  <input type="text" id="to" class="form-control" name="to" required></label>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Value</label>
-                                        <input type="text" class="form-control" name="value" required>
+                                        <label>Value:  <input type="text" class="form-control" name="value" required></label>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Fee</label>
-                                        <input type="text" class="form-control" name="fee" required>
+                                        <label>Fee:  <input type="text" class="form-control" name="fee" required></label>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Data</label>
-                                        <input type="text" class="form-control" name="data" required>
+                                        <label>Data:  <input type="text" class="form-control" name="data" required></label>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Public Key</label>
-                                        <input type="text" class="form-control" name="senderPubKey" required>
+                                        <label>Public Key:  <input type="text" class="form-control" name="senderPubKey" required></label>
+                                    </div>
+                                    <hr class="my-4">
+                                    <div>
+                                        <p class="lead">Fill in the form below to sign your Miewcoin transaction!</p>
+                                        <hr class="my-4">
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Private Key</label>
-                                        <input type="text" class="form-control" name="senderPrivKey" required>
+                                        <label>Private Key:  <input type="text" class="form-control" name="senderPrivKey" required></label>
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Secret Message</label>
-                                        <input type="text" class="form-control" name="scrtMsg" required>
+                                        <label>Secret Message:  <input type="text" class="form-control" name="scrtMsg" required></label>
                                     </div>
 
                                     <div class="form-group">
-                                        <input type="submit" class="btn btn-defautl" value="Send">
+                                        <button type="submit" class="btn btn-primary" value="Send">Send</button>
                                     </div>
                                 </div>
                             </form>

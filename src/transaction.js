@@ -3,7 +3,7 @@
 const CryptoJS = require('crypto-js');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
-var crypto = require('crypto')
+var crypto = require('crypto');
 // var ecdsa = require('ecdsa');
 import { keyPairFromPriv } from "./wallet";
 
