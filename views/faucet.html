@@ -4,6 +4,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
         <title>faucet</title>
     </head>
     <body>
@@ -38,11 +39,19 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label>Request Amount (less than 1000000):  <input type="number" class="form-control" name="requestAmount" id="requestAmount" required></label>
+                                        <label>Request Amount (less than 1000000 micro coins):  <input type="number" class="form-control" name="requestAmount" id="requestAmount" required></label>
                                     </div>
 
                                     <div class="form-group">
                                         <label>Node URL:  <input type="text" class="form-control" name="nodeURL" id="nodeURL" ></label>
+                                    </div>
+
+                                    <div>
+                                        <form action="?" method="POST">
+                                            <div class="g-recaptcha" data-sitekey="6LfQQLknAAAAAFNKIi5xZfsl27k_s1VRmnjPawnr"></div>
+                                            <br/>
+                                            <input type="submit" value="Submit">
+                                          </form>
                                     </div>
 
                                     <div class="form-group">
