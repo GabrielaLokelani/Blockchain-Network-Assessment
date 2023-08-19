@@ -5,13 +5,15 @@
 // const CryptoJS = require('crypto-js');
 // const express = require('express');
 // const WebSocket = require('ws');
+// const path = require('path')
 // const bodyParser = require('body-parser');
 
 // import BlockChain from "./chain";
 // import Transaction from "./transaction";
 // import { createDate } from './block';
 // import { createWallet, validateWallet, keyPairFromPriv } from "./wallet";
-// import { MIEWCOIN_BLOCKCHAIN } from '../index'
+// import { MIEWCOIN_BLOCKCHAIN } from '../index';
+// import { faucetTransaction } from './faucet';
 
 // const http_port = process.env.HTTP_PORT || 5555;
 // const p2p_port = process.env.P2P_PORT || 6001;
@@ -24,34 +26,51 @@
 //     RESPONSE_BLOCKCHAIN: 2
 // };
 
-
-// // rest api logic for blocks, createWallet, pendingTransactions, minePendingTransactions, peers, still fixing sendTransaction
+// // rest api logic for blocks, createWallet, pendingTransactions, minePendingTransactions, peers, sendTransactions, ect...
 // export function initHttpServer() {
 //     let app = express();
-//     app.use(bodyParser.json());
+//     app.use(express.urlencoded({ extended: false }));
+//     app.use(express.json());
+//     app.set('view engine', 'ejs');
+//     app.engine('html', require('ejs').renderFile);
+//     app.use(express.static('public'));
 
-//     const myWallet = createWallet();
-//     console.log('MyWallet: address: ' + myWallet.address + '\n' + 'myWallet publicKey: ' + myWallet.pubKey + '\n' + 'myWallet publicKeyCompressed: ' + myWallet.publicKeyCompressed + '\n' + 'myWalet privateKey: ' + myWallet.privateKey);
-//     const jakeWallet = createWallet();
-//     console.log('jakeWallet: address: ' + jakeWallet.address + '\n' + 'jakeWallet publicKey: ' + jakeWallet.pubKey + '\n' +  'jakeWallet publicKeyCompressed: ' + jakeWallet.publicKeyCompressed + '\n' + 'jakeWallet privateKey: ' + jakeWallet.privateKey);
-//     // console.log("is myWallet privateKey equal to publicKey?", validateWallet(jakeWallet.privateKey, jakeWallet.publicKey));
+//     //  Homepage
+//     app.get('/home', (req, res) => {
+//         res.render('../views/home.html');
+//     });
 
-//     app.get('/', (req, res) => {
-//         res.send("Welcome! Here is the latest block thats been added to the chain:" + JSON.stringify(MIEWCOIN_BLOCKCHAIN.getBlock(MIEWCOIN_BLOCKCHAIN.getHeight())))
-//     })
+//     // get block explorer page
+//     app.get('/blockExplorer', (req, res) => {
+//         res.render('../views/blockExplorer.html');
+//     });
+
+//     // get wallet explorer page
+//     app.get('/wallet', (req, res) => {
+//         res.render('../views/wallet.html');
+//     });
+
+//     // // get faucet page
+//     // app.get('/faucet', (req, res) => {
+//     //     res.render('../views/faucet.html');
+//     // });
+
+//     // app.post('/faucet', (req, res) => {
+//     //     faucetTransaction(req.body.toAddress, req.body.requestAmount);
+//     // });
 
 //     // get all blocks in the blockchain
 //     app.get('/blocks', (req, res) => res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN)));
 
 //     // get a specific block by its index *** currently having to use req.body.idex need to figure out how to do through http :)
-//     app.get('/blocks/{:index}', (req, res) => {
+//     app.get('/blocks/:index', (req, res) => {
 //         res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.getBlock(req.body.index)));
 //     });
 
-//     // create a new wallet and return the public and private keys
-//     app.post('/createWallet', (req, res) => {
+//     // create a new wallet and return the address, private and public keys
+//     app.get('/createWallet', (req, res) => {
 //         let newWallet = createWallet();
-//         res.send({ 'address:': newWallet.address, "pubKey": newWallet.pubKey, "publicKeyCompressed": newWallet.publicKeyCompressed, "privKey": newWallet.privateKey});
+//         res.send({ 'address:': newWallet.address, "publicKey": newWallet.pubKey, "publicKeyCompressed": newWallet.publicKeyCompressed, "privKey": newWallet.privateKey});
 //     });
 
 //     // get all pending transactions
@@ -69,6 +88,11 @@
 //     app.get('/transactions/:txnHash', (req, res) => {
 //         const transaction = MIEWCOIN_BLOCKCHAIN.getTransactionByHash(req.body.txnHash);
 //         res.send(transaction);
+//     });
+
+//     // get the send transaction page
+//     app.get('/transactions/send', (req, res) => {
+//         res.render('../views/sendTransaction.html');
 //     });
 
 //     // send a new transaction
@@ -137,6 +161,10 @@
 //     });
 
 //     app.listen(http_port, () => console.log('Listening http on port: ' + http_port));
+// }
+
+// function drawView(res, view, data) {
+//     res.render('../views/' + view + '.html', data)
 // }
 
 // export let initP2PServer = () => {
