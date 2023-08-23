@@ -10,7 +10,7 @@ import { createDate } from './block';
 import { faucetPublicKeyComp, faucetAddress, faucetPrivKey, faucetmsg } from "./faucetWallet";
 import { MIEWCOIN_BLOCKCHAIN } from '../index';
 
-const faucetHttp_port = 7777;
+const faucetHttp_port = process.env.FAUCET_PORT || 7777;
 
 // create the faucet transaction, sign the faucet transaction, and push to the pendingTranactions pool to be mined
 export function faucetTransaction(toAddress, requestAmount) {
@@ -22,7 +22,6 @@ export function faucetTransaction(toAddress, requestAmount) {
     return true;
 }
 
-// for some reason causes issue when a new node starts because it takes the port ie. HTTP_PORT=4000 P2P_PORT=6002 PEERS=ws://localhost:6001 npm start
 // create the faucet server for faucet app
 export function initFaucetServer() {
     let app = express();
@@ -59,4 +58,4 @@ export function initFaucetServer() {
             //     })
             // })
 
-initFaucetServer();
+// initFaucetServer();
