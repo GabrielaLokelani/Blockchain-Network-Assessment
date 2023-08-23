@@ -29,6 +29,7 @@ export default class Node {
 
 }
 
+// create the P2P server to let nodes interact
 export let initP2PServer = () => {
     let server = new WebSocket.Server({port: p2p_port});
     server.on('connection', ws => initConnection(ws));
@@ -36,6 +37,7 @@ export let initP2PServer = () => {
 
 };
 
+// handle the blockchain and responses for the nodes when a new event occurs
 let handleBlockchainResponse = (message) => {
     let receivedBlocks = JSON.parse(message.data);
     if (!receivedBlocks.chain) {

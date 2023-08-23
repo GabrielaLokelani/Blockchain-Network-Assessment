@@ -52,7 +52,7 @@ export function initHttpServer() {
     // get all blocks in the blockchain
     app.get('/blocks', (req, res) => res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN)));
 
-    // get a specific block by its index *** currently having to use req.body.idex need to figure out how to do through http :)
+    // get a specific block by its index 
     app.get('/blockIndex/:index', (req, res) => {
         res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.getBlock(req.params.index)));
     });
@@ -66,7 +66,7 @@ export function initHttpServer() {
     // get all pending transactions
     app.get('/transactions/pending', (req, res) => {
         res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.pendingTransactions));
-    })
+    });
 
     // get all confirmed transactions 
     app.get('/transactions/confirmed', (req, res) => {
@@ -107,27 +107,29 @@ export function initHttpServer() {
         res.send();
     });
 
-    // get all transactions for a specific address ** need to change from req.body.address to use the http **
+    // get all transactions for a specific address 
     app.get('/address/:address/transactions', (req, res) => {
         const transactions = MIEWCOIN_BLOCKCHAIN.getTransactionsForAddress(req.params.address);
         res.send(transactions);
     });
 
-    // get the balance for a specific address ** need to change from req.body.address to use the http **
+    // get the balance for a specific address 
     app.get('/address/:address/balance', (req, res) => {
         const balance = MIEWCOIN_BLOCKCHAIN.getBalanceOfAddress(req.params.address);
         res.send(balance.toString());
     });    
 
+    // get miner main page
     app.get('/miner', (req, res) => {
         res.render('../views/miner.html');
     });
 
+    // get minePendingTransactions / mineNextBlock html page and form to be able to mine the next block
     app.get('/minePendingTransactions', (req, res) => {
         res.render('../views/mineNextBlock.html');
     });
 
-    // mine pending txns to mine the next block ** working on miner reward transaction **
+    // mine pending txns to mine the next block 
     app.post('/minePendingTransactions', (req, res) => {
         // submit miners address and init the miner
         MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body.miningRewardAddress);

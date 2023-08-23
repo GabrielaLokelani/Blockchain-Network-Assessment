@@ -23,7 +23,7 @@ export default class BlockChain {
             "data": "genesis tx",
             "senderPubKey": "000000000000000000000000000000000000000000000000000000000000000000",
             "transactionDataHash": "2466ce78ebefb1e1f69948ade3d85d9b1beab79d724f9624ebde6b74a1cd8508",
-            "senderSignature": ["000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000000000000000000000000000"],
+            "signature": ["000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000000000000000000000000000"],
             "minedInBlockIndex": 0, "transferSuccessful": true
             }], "0000000000000000000000000000000000000000", createDate(), '')
     }
@@ -67,7 +67,7 @@ export default class BlockChain {
         }
         let totalReward = totalFees + this.miningReward;
         const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
-        minerTXN.signRewardTransaction("000000000000000000000000000000000000000000000000000000000000000000");
+        minerTXN.signRewardTransaction(["000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000000000000000000000000000"]);
         this.pendingTransactions.push(minerTXN);
 
         return block;
@@ -169,6 +169,7 @@ export default class BlockChain {
         return true;
     }
 
+    // check if the new block is valid by comparing newBlock to prevBlock via index and block hashes then by recalculating the block hash
     isValidNewBlock(newBlock, previousBlock) {
         if (previousBlock.index + 1 !== newBlock.index) {
             console.log('invalid index');
@@ -182,6 +183,7 @@ export default class BlockChain {
         return true;
     }
 
+    // adds the new block to the chain after running through isValidNewBlock() function
     addBlock(newBlock) {
         const latestBlock = this.getBlock(this.getHeight());
         console.log('is new block valid? ' + this.isValidNewBlock(newBlock, latestBlock))
@@ -190,6 +192,7 @@ export default class BlockChain {
         }
     }
 
+    // checks to see if the recieved chain is valid
     isValidChain(blockchainToValidate) {
         if (JSON.stringify(blockchainToValidate[0]) !== JSON.stringify(this.creationOfGenesisBlock())) {
             return false;
@@ -205,6 +208,7 @@ export default class BlockChain {
         return true;
     }
 
+    // will replace the chain if the recieved chain is longer (has more work) and is valid by running through replaceChain() function
     replaceChain(newBlocks) {
         if (this.isValidChain(newBlocks) && newBlocks.length > this.chain.length) {
             console.log('recieved blockchain is valid. Replacing current blockchain with recieved blockchain');

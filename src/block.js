@@ -2,6 +2,7 @@
 // IMPORT RELEVANT LIBRARIES
 const CryptoJS = require('crypto-js');
 
+// create the block class which each new block will follow
 export default class Block {
     constructor(index, transactions, minedBy, dateCreated, previousBlockHash) {
         this.index = index;
@@ -15,19 +16,25 @@ export default class Block {
         this.blockHash = this.calculateBlockHash();
     }
 
+    // calculate the block DATA hash using SHA256
     calculateBlockDataHash() {
         return CryptoJS.SHA256(this.index + JSON.stringify(this.transactions) + this.difficulty + this.previousBlockHash + this.minedBy).toString();
     }
 
+    // calculate the block hash using SHA256 which takes the blockDataHash and nonce
     calculateBlockHash() {
         return CryptoJS.SHA256(this.blockDataHash + this.nonce).toString();
     }
 
+    // check the validity of each transaction in the block and make sure there are no missing values
     checkTransactionsValidity() {
         for (const txn of this.transactions) {
-
+        if (!txn.from || !txn.to || !txn.value || !txn.fee || !txn.data || !txn.senderPubkey) {
+            throw new Error('Sorry! Transaction is missing a value.');
+        } else {
+            return true;
         }
-        return true;
+        }
     }
 
     // mine the block POW taking in difficulty and newblock data
@@ -51,6 +58,7 @@ export function calculateBlockHash(newBlock) {
     return CryptoJS.SHA256(newBlock.blockDataHash + newBlock.nonce).toString();
 }
 
+// create an accurate date in ISO format
 export function createDate() {
     let date1 = new Date();
     let date = date1.toISOString();

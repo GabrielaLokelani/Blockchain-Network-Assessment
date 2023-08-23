@@ -1,4 +1,3 @@
-
 // IMPORT RELEVANT LIBRARIES
 const CryptoJS = require('crypto-js');
 const EC = require('elliptic').ec;
@@ -6,7 +5,7 @@ const ec = new EC('secp256k1');
 var crypto = require('crypto');
 import { keyPairFromPriv } from "./wallet";
 
-// (*** simplified for now, add extra params later ***)
+// create the transaction class which each new transaaction will follow
 export default class Transaction {
     constructor(from, to, value, fee, dateCreated, data, senderPubKey, senderPrivKey) {
         this.from = from;
@@ -19,11 +18,12 @@ export default class Transaction {
         this.senderPrivKey = senderPrivKey;
     }
 
+    // calculate the hash for the transaction using cryptoJS and SHA256
     calculateTransactionHash() {
         return CryptoJS.SHA256(this.from + this.to + this.value + this.fee + this.dateCreated + this.data + this.senderPubKey).toString();
     }
 
-    // sign the transaction with the private key
+    // sign the transaction with the private key and a secret message
     signTransaction(privateKey, scrtMsg) {
         // check miner tx is valid
         if (this.from === null) return true;
@@ -34,7 +34,6 @@ export default class Transaction {
         // verify source account is person's address
         const publicKey = signingKey.getPublic();
         const publicKeyCompressed = publicKey.encodeCompressed("hex");
-
         if (publicKeyCompressed !== this.senderPubKey) {
             throw new Error('Sorry, you cannot sign transactions from a foreign wallet!');
         }
@@ -47,16 +46,19 @@ export default class Transaction {
         // const sign = signingKey.sign(msg, privateKey, 'base64');
         // console.log("you have reached the signing:  " + sign);
 
+        // crate signature
         var signature = ec.sign(msg, privateKey, {canonical: true});
 
         let hexToDecimal = (x) => ec.keyFromPrivate(x, "hex").getPrivate().toString(10);
         let pubKeyRecovered = ec.recoverPubKey(hexToDecimal(msg), signature, signature.recoveryParam, "hex");
 
+        // verify the signature is valid
         var isValid = ec.verify(msg, signature, pubKeyRecovered);
         console.log("Is this a valid signature?   " + isValid) 
 
         // signature to DER format? ** currently not in DER format but can change with solution below :)
         // this.signature = signature.toDER('hex');
+        // connect created signature to signature element of transaction
         this.signature = signature;
     }
 

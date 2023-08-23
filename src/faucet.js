@@ -7,21 +7,23 @@ const express = require('express');
 const path = require('path')
 import Transaction from "./transaction";
 import { createDate } from './block';
-import { faucetPublicKeyComp, faucetAddress, faucetPrivKey } from "./faucetWallet";
+import { faucetPublicKeyComp, faucetAddress, faucetPrivKey, faucetmsg } from "./faucetWallet";
 import { MIEWCOIN_BLOCKCHAIN } from '../index';
 
 const faucetHttp_port = 7777;
 
+// create the faucet transaction, sign the faucet transaction, and push to the pendingTranactions pool to be mined
 export function faucetTransaction(toAddress, requestAmount) {
     if (requestAmount <= 1000000 && toAddress) {
         const faucetTXN = new Transaction(faucetAddress, toAddress, requestAmount, 0, createDate(), "faucet tx", faucetPublicKeyComp);
-        faucetTXN.signTransaction(faucetPrivKey, "fromTheFaucet!");
+        faucetTXN.signTransaction(faucetPrivKey, faucetmsg);
         MIEWCOIN_BLOCKCHAIN.pendingTransactions.push(faucetTXN);
     }
     return true;
 }
 
 // for some reason causes issue when a new node starts because it takes the port ie. HTTP_PORT=4000 P2P_PORT=6002 PEERS=ws://localhost:6001 npm start
+// create the faucet server for faucet app
 export function initFaucetServer() {
     let app = express();
     app.use(express.urlencoded({ extended: false }));
@@ -35,6 +37,7 @@ export function initFaucetServer() {
             res.render('../views/faucet.html');
         });
     
+        // get miewcoins from the faucet after putting in address and passing reCAPTCHA validation (see reCAPTCHA in html)
         app.post('/faucet', (req, res) => {
             // faucetTransaction(req.body.toAddress, req.body.requestAmount);
             let toAddress = req.body.toAddress;
