@@ -53,8 +53,8 @@ export function initHttpServer() {
     app.get('/blocks', (req, res) => res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN)));
 
     // get a specific block by its index *** currently having to use req.body.idex need to figure out how to do through http :)
-    app.get('/blocks/:index', (req, res) => {
-        res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.getBlock(req.body.index)));
+    app.get('/blockIndex/:index', (req, res) => {
+        res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN.getBlock(req.params.index)));
     });
 
     // create a new wallet and return the address, private and public keys
@@ -75,8 +75,8 @@ export function initHttpServer() {
     });
 
     // get specific transaction by its hash 
-    app.get('/transactions/:txnHash', (req, res) => {
-        const transaction = MIEWCOIN_BLOCKCHAIN.getTransactionByHash(req.body.txnHash);
+    app.get('/transactionHash/:txnHash', (req, res) => {
+        const transaction = MIEWCOIN_BLOCKCHAIN.getTransactionByHash(req.params.txnHash);
         res.send(transaction);
     });
 
@@ -109,13 +109,13 @@ export function initHttpServer() {
 
     // get all transactions for a specific address ** need to change from req.body.address to use the http **
     app.get('/address/:address/transactions', (req, res) => {
-        const transactions = MIEWCOIN_BLOCKCHAIN.getTransactionsForAddress(req.body.address);
+        const transactions = MIEWCOIN_BLOCKCHAIN.getTransactionsForAddress(req.params.address);
         res.send(transactions);
     });
 
     // get the balance for a specific address ** need to change from req.body.address to use the http **
     app.get('/address/:address/balance', (req, res) => {
-        const balance = MIEWCOIN_BLOCKCHAIN.getBalanceOfAddress(req.body.address);
+        const balance = MIEWCOIN_BLOCKCHAIN.getBalanceOfAddress(req.params.address);
         res.send(balance.toString());
     });    
 

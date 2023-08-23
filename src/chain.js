@@ -74,9 +74,9 @@ export default class BlockChain {
     }
 
     addTransaction(transaction) {
-        if (!transaction.from || !transaction.to || !transaction.value || !transaction.fee || !transaction.data || !transaction.senderPubkey) {
-            throw new Error('Sorry! Transaction is missing a value.');
-        }
+        // if (!transaction.from || !transaction.to || !transaction.value || !transaction.fee || !transaction.data || !transaction.senderPubkey) {
+        //     throw new Error('Sorry! Transaction is missing a value.');
+        // }
         // ***!!! TURNED OFF FOR NOW WHILE SIGNING WAS CHANGED ***!!!
         // if (!transaction.isValid()) {
         //     throw new Error('Cannot add invalid transaction to the chain');
