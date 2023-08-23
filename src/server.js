@@ -1,11 +1,9 @@
 'use strict';
 
 // IMPORT RELEVANT LIBRARIES
-const CryptoJS = require('crypto-js');
 const express = require('express');
 const WebSocket = require('ws');
-const path = require('path')
-const bodyParser = require('body-parser');
+const path = require('path');
 
 import BlockChain from "./chain";
 import Transaction from "./transaction";
@@ -83,12 +81,12 @@ export function initHttpServer() {
     });
 
     // get the send transaction page
-    app.get('/transactions/send', (req, res) => {
+    app.get('/transaction/send', (req, res) => {
         res.render('../views/sendTransaction.html');
     });
 
     // send a new transaction
-    app.post('/transactions/send', (req, res) => {
+    app.post('/transaction/send', (req, res) => {
         // create a new transaction
         if (req.body.fee >= 10 && req.body.from != null && req.body.to != null) {
             const newTXN = new Transaction(req.body.from, req.body.to, req.body.value, req.body.fee, createDate(), req.body.data, req.body.senderPubKey);
@@ -98,7 +96,7 @@ export function initHttpServer() {
             // submit txn
             MIEWCOIN_BLOCKCHAIN.addTransaction(newTXN);
         } else {
-            res.send("Sorry, your transaction is missing either a to or from address or the fee is not greater than 10 micro coins");
+            res.send("Sorry, your transaction is missing either a to or from address or the fee is less than 10 micro coins");
         }
         // console.log("congragulations! Transaction was sent");
         res.send();

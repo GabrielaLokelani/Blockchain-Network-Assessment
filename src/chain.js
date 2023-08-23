@@ -22,7 +22,7 @@ export default class BlockChain {
             "dateCreated": createDate(),
             "data": "genesis tx",
             "senderPubKey": "000000000000000000000000000000000000000000000000000000000000000000",
-            "transactionDataHash": "8a684cb8491ee419e7d46a0fd24...ecc2",
+            "transactionDataHash": "2466ce78ebefb1e1f69948ade3d85d9b1beab79d724f9624ebde6b74a1cd8508",
             "senderSignature": ["000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000000000000000000000000000"],
             "minedInBlockIndex": 0, "transferSuccessful": true
             }], "0000000000000000000000000000000000000000", createDate(), '')

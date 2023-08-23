@@ -4,7 +4,6 @@ const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 var crypto = require('crypto');
 const express = require('express');
-const WebSocket = require('ws');
 const path = require('path')
 import Transaction from "./transaction";
 import { createDate } from './block';
@@ -41,19 +40,20 @@ export function initFaucetServer() {
             let toAddress = req.body.toAddress;
             let requestAmount = req.body.requestAmount;
             faucetTransaction(toAddress, requestAmount);
+        });
+
+    app.listen(faucetHttp_port, () => console.log('Faucet listening http on port: ' + faucetHttp_port));    
+}
+
+// function drawView(res, view, data) {
+//     res.render('../views/' + view + '.html', data)
+// }
+
             // .then((transaction) => {
             //     drawView(res, 'faucet', {
             //         toAddress: toAddress,
             //         requestAmount: requestAmount
             //     })
             // })
-        });
-
-    app.listen(faucetHttp_port, () => console.log('Faucet listening http on port: ' + faucetHttp_port));    
-}
-
-function drawView(res, view, data) {
-    res.render('../views/' + view + '.html', data)
-}
 
 initFaucetServer();
