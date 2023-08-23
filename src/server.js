@@ -119,6 +119,14 @@ export function initHttpServer() {
         res.send(balance.toString());
     });    
 
+    app.get('/miner', (req, res) => {
+        res.render('../views/miner.html');
+    });
+
+    app.get('/minePendingTransactions', (req, res) => {
+        res.render('../views/mineNextBlock.html');
+    });
+
     // mine pending txns to mine the next block ** working on miner reward transaction **
     app.post('/minePendingTransactions', (req, res) => {
         // submit miners address and init the miner
