@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <title>wallet</title>
+        <title>openWallet</title>
     </head>
     <body>
         <div class="contrainer">
@@ -14,9 +14,9 @@
                         <a class="navbar-brand" href="/home">MiewCoin Blockchain Network</a>
                     </div>
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="/wallet">Wallet</a></li>
+                        <li><a href="/wallet">Wallet</a></li>
                         <li><a href="/createWallet">Create Wallet</a></li>
-                        <li><a href="/openWallet">Open Wallet</a></li>
+                        <li class="active"><a href="/openWallet">Open Wallet</a></li>
                         <li><a href="/transaction/send">Send Transaction</a></li>
                         <li><a href="/address/:address/balance">Balance</a></li>
                         <li><a href="/address/:address/transactions">Transactions</a></li>
@@ -27,11 +27,25 @@
                     <div class="jumbotron col-sm-12">
                         
                         <div class="col-sm-9">
-                            <h1 class="display-3">Welcome to the Miewcoin Blockchain Wallet Hub!</h1>
+                            <h1 class="display-3">Already have an existing wallet?</h1>
                         
                             <hr class="my-4">
                         
-                            <p>From here, you can create a new wallet, send a transaction, and look up your balance or transactions using your address!</p>
+                            <p>From here, you can open an existing wallet using your private key!</p>
+
+                            <form class="row" method="post" enctype="application/x-www-form-urlencoded">
+
+                                <div class="col-md-6 mb-3">
+
+                                    <div class="form-group">
+                                        <label>Private Key:  <input type="text" class="form-control" name="privKey" id="privKey" ></label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary" value="Unlock">Unlock</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

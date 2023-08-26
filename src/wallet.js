@@ -42,3 +42,18 @@ export function keyPairFromPriv(privKey) {
     // console.log("here is the supposed generated key from private: " + JSON.stringify(key));
     return key;
 }
+
+export function openWallet(privKey) {
+    const keyPair = ec.keyFromPrivate(privKey);
+    const publicKey = keyPair.getPublic();
+    const publicKeyCompressed = publicKey.encodeCompressed("hex");
+    const privateKey = keyPair.getPrivate('hex');
+    const pubKey = keyPair.getPublic('hex');
+    const address = RIPEMD160(pubKey).toString();
+    return {
+        address,
+        pubKey,
+        publicKeyCompressed,
+        privateKey,
+    }
+}

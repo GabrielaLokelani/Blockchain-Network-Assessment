@@ -8,7 +8,7 @@ const path = require('path');
 import BlockChain from "./chain";
 import Transaction from "./transaction";
 import { createDate } from './block';
-import { createWallet } from "./wallet";
+import { createWallet, openWallet } from "./wallet";
 import { sockets, broadcast, responseLatestMsg, connectToPeers} from "./node"
 import { MIEWCOIN_BLOCKCHAIN } from '../index';
 import { faucetTransaction } from './faucet';
@@ -38,6 +38,19 @@ export function initHttpServer() {
     // get wallet explorer page
     app.get('/wallet', (req, res) => {
         res.render('../views/wallet.html');
+    });
+
+    app.get('/openWallet', (req, res) => {
+        res.render('../views/openWallet.html');
+    });
+
+    app.post('/openWallet', (req, res) => {
+        if (req.body.privKey) {
+            let openedWallet = openWallet(req.body.privKey);
+            res.send({ 'address:': openedWallet.address, "publicKey": openedWallet.pubKey, "publicKeyCompressed": openedWallet.publicKeyCompressed, "privKey": openedWallet.privateKey});
+        } else {
+            throw new Error("Sorry we could not find a wallet for that private key, check to make sure it is entered correctly.")
+        }
     });
 
     // // get faucet page
