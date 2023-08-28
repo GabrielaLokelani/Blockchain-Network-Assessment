@@ -21,13 +21,13 @@ export default class BlockChain {
             "from": "0000000000000000000000000000000000000000",
             "to": faucetAddress,
             "value": 1000000000000, "fee": 0,
-            "dateCreated": createDate(),
+            "dateCreated": "2023-08-22T05:30:49.694Z",
             "data": "genesis tx",
             "senderPubKey": "000000000000000000000000000000000000000000000000000000000000000000",
             "transactionDataHash": "2466ce78ebefb1e1f69948ade3d85d9b1beab79d724f9624ebde6b74a1cd8508",
             "signature": {"r": "000000000000000000000000000000000000000000000000000000000000000000", "s": "000000000000000000000000000000000000000000000000000000000000000000"},
             "minedInBlockIndex": 0, "transferSuccessful": true
-            }], "0000000000000000000000000000000000000000", createDate(), '')
+            }], "0000000000000000000000000000000000000000", "2023-08-22T05:30:49.694Z", '')
     }
 
     // The method to get the current height of the chain (the latest added block in the chain length).

@@ -14,7 +14,7 @@ import { MIEWCOIN_BLOCKCHAIN } from '../index';
 import { faucetTransaction } from './faucet';
 
 
-const http_port = process.env.HTTP_PORT || 5555;
+export const http_port = process.env.HTTP_PORT || 5555;
 
 // rest api logic for blocks, createWallet, pendingTransactions, minePendingTransactions, peers, sendTransactions, ect...
 export function initHttpServer() {

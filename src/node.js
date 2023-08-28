@@ -8,6 +8,8 @@ const WebSocket = require('ws');
 const path = require('path')
 const bodyParser = require('body-parser');
 import { MIEWCOIN_BLOCKCHAIN } from '../index';
+import { createDate } from './block';
+import { http_port } from './server';
 
 const p2p_port = process.env.P2P_PORT || 6001;
 export const initialPeers = process.env.PEERS ? process.env.PEERS.split(',') : [];
@@ -20,14 +22,23 @@ export let MessageType = {
 };
 
 export default class Node {
-    constructor(nodeID, selfURL, peers, chain) {
-        this.nodeID = nodeID,
+    constructor(selfURL, p2p, peers, chain) {
+        this.nodeID = this.calculateNodeID(),
         this.selfURL = selfURL,
+        this.p2p = p2p,
         this.peers = peers,
         this.chain = chain
     }
 
+    calculateNodeID() {
+        let date = createDate();
+        let random = Math.floor(Math.random() * 100);
+        return CryptoJS.SHA256(date.toString() + random.toString()).toString();
+    }
 }
+
+let node = new Node(`http://127.0.0.1:${http_port}/`, `http://127.0.0.1:${p2p_port}/`, sockets, "6f744571155652ae36dafbb6272f7949eae93369325e5e34da72d07e6d8bce1c");
+console.log(node);
 
 // create the P2P server to let nodes interact
 export let initP2PServer = () => {
