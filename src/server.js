@@ -108,10 +108,11 @@ export function initHttpServer() {
 
             // submit txn
             MIEWCOIN_BLOCKCHAIN.addTransaction(newTXN);
+            console.log("Here is your new Transaction Hash: " + newTXN.transactionHash);
+            res.redirect('/home');
         } else {
             res.send("Sorry, your transaction is missing either a to or from address or the fee is less than 10 micro coins");
         }
-        // console.log("congragulations! Transaction was sent");
         res.send();
     });
 
@@ -142,12 +143,38 @@ export function initHttpServer() {
         res.render('../views/mineNextBlock.html');
     });
 
-    // mine pending txns to mine the next block 
+    // mine pending txns to mine the next block (all in one solution, no mining job and block candidate loading, use for testing purposes)
     app.post('/minePendingTransactions', (req, res) => {
         // submit miners address and init the miner
         MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body.miningRewardAddress);
         broadcast(responseLatestMsg());
         res.send();
+    });
+
+    // get mining job page (just pulls up mineNextBlock html)
+    app.get('/getMiningJob', (req, res) => {
+        res.render('../views/mineNextBlock.html');
+    });
+
+    // get mining job, prepare the next block candidate for the miner
+    app.post('/getMiningJob', (req, res) => {
+        // submit miners address and get a mining job
+        if (req.body.miningRewardAddress) {
+            let blockCandidate = MIEWCOIN_BLOCKCHAIN.getMiningJob(req.body.miningRewardAddress);
+            res.send(blockCandidate);
+        }
+    });
+
+    // get submit mined block candidate page
+    app.get('/submitMinedBlock', (req, res) => {
+        res.render('../views/submitMinedBlock.html');
+    });
+
+    // post the new mined block for submission and approval to be added to the chain
+    app.post('/submitMinedBlock', (req, res) => {
+        MIEWCOIN_BLOCKCHAIN.submitMinedBlock(req.body.newBlock);
+        broadcast(responseLatestMsg());
+        res.send("Congratulations, You have successfully mined the next block in the chain!")
     });
 
     // reset the chain for debugging purposes
@@ -170,7 +197,7 @@ export function initHttpServer() {
     // notify peers of new block ** need to do **
     app.post('/peers/notify-new-block', (req, res) => {
         broadcast(responseLatestMsg());
-        res.send();
+        res.send(broadcast(responseLatestMsg()));
     });
 
     app.listen(http_port, () => console.log('Listening http on port: ' + http_port));

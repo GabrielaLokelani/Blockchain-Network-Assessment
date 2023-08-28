@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../public/index.css">
+        <title>mineNextBlock</title>
+    </head>
+    <body>
+        <div class="contrainer">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="/home">MiewCoin Blockchain Network</a>
+                    </div>
+                    <ul class="nav navbar-nav">
+                        <li><a href="/miner">Miner</a></li>
+                        <li><a href="/minePendingTransactions">MineNextBlock</a></li>
+                        <li><a href="/getMiningJob">getMiningJob</a></li>
+                        <li class="active"><a href="/submitMinedBlock">submitMinedBlock</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="row">
+                <div class="jumbotron col-sm-12">
+
+                    <div class="col-sm-3">
+                        <img src="https://img.freepik.com/premium-vector/funny-cartoon-cat-cute-cat-playing-wearing-construction-hat_224300-85.jpg?w=300" alt="kittyminer"/>
+                    </div>
+                    
+                    <div class="col-sm-7">
+                        <h1 class="display-3">Welcome to the Miewcoin Blockchain Network Miner!</h1>
+                    
+                        <hr class="my-4">
+                    
+                        <h3>Put that hardhat on and mine the next block!</h3>
+
+                        <hr class="my-4">
+
+                        <p>Submit your mined block and hopefully it will be accepted onto the chain!</p>
+
+                        <form class="row" method="post" enctype="application/x-www-form-urlencoded">
+
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label>Enter your mined block:  <input type="textarea" class="form-control" name="newBlock" id="newBlock" required></label>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary" value="submit">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+                <div class="credits">
+                    <footer>
+                        Icon made by [Ghagra] from www.freePik.com 
+                    </footer>
+                </div>
+        </div>
+    </body>
+</html>

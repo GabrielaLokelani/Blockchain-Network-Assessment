@@ -6,6 +6,7 @@ import Transaction from './transaction';
 import { broadcast, responseLatestMsg } from "./node";
 import { faucetAddress } from "./faucetWallet";
 const CryptoJS = require('crypto-js');
+const math = require('mathjs')
 
 export default class BlockChain {
     constructor() {
@@ -14,6 +15,7 @@ export default class BlockChain {
         this.miningReward = 5000000;
     }
 
+    // create the genesis block to start the chain
     creationOfGenesisBlock() {
         return new Block(0, [{
             "from": "0000000000000000000000000000000000000000",
@@ -23,7 +25,7 @@ export default class BlockChain {
             "data": "genesis tx",
             "senderPubKey": "000000000000000000000000000000000000000000000000000000000000000000",
             "transactionDataHash": "2466ce78ebefb1e1f69948ade3d85d9b1beab79d724f9624ebde6b74a1cd8508",
-            "signature": ["000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000000000000000000000000000"],
+            "signature": {"r": "000000000000000000000000000000000000000000000000000000000000000000", "s": "000000000000000000000000000000000000000000000000000000000000000000"},
             "minedInBlockIndex": 0, "transferSuccessful": true
             }], "0000000000000000000000000000000000000000", createDate(), '')
     }
@@ -63,9 +65,9 @@ export default class BlockChain {
         // ?? should the minertxn be the fee from the txns being mined AND the reward and *** main issue rn is how to do all those txns and signing with privkeys
         let totalFees = 0;
         for (const txn of block.transactions) {
-            totalFees += txn.fee;
+            math.add(totalFees, txn.fee);
         }
-        let totalReward = totalFees + this.miningReward;
+        const totalReward = totalFees + 5000000;
         const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
         minerTXN.signRewardTransaction(["000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000000000000000000000000000"]);
         this.pendingTransactions.push(minerTXN);
@@ -73,6 +75,51 @@ export default class BlockChain {
         return block;
     }
 
+    // function to get the mining job, miner submits their address, a block candidate is created to be given to the miner
+    getMiningJob(miningRewardAddress) {
+        const latestBlock = this.getBlock(this.getHeight());
+        let newIndex = latestBlock.index + 1;
+
+        let block = new Block(newIndex, this.pendingTransactions, miningRewardAddress, createDate(), latestBlock.blockHash);
+
+        let totalFees = 0;
+        for (const txn of block.transactions) {
+            totalFees =  math.add(totalFees, txn.fee);
+            console.log("total fees: " + totalFees);
+        }
+        let totalReward = math.add(totalFees, this.miningReward);
+        const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
+        minerTXN.signRewardTransaction({"r": "000000000000000000000000000000000000000000000000000000000000000000", "s": "000000000000000000000000000000000000000000000000000000000000000000"});
+        this.pendingTransactions.unshift(minerTXN);
+
+        block.mineBlock(2, block);
+        console.log('Block was successfully mined!');
+
+        return block;
+    }
+
+    // submit a new mined block 
+    submitMinedBlock(newBlock) {
+        let candidate = JSON.parse(newBlock);
+        let rewardAmount = candidate.transactions[0].value;
+        console.log("here is the new block index for candidate: " + candidate.index);
+        const latestBlock = this.getBlock(this.getHeight());
+        if (candidate.index === latestBlock.index + 1) {
+            let candidateBlockHash = calculateBlockHash(candidate);
+            console.log("candidate block hash re-calculated: " + candidateBlockHash);
+            console.log("candidate block hash: " + candidate.blockHash);
+            if (candidateBlockHash === candidate.blockHash) {
+                MIEWCOIN_BLOCKCHAIN.addBlock(candidate);
+                this.pendingTransactions = [];
+                return candidate, rewardAmount
+            }
+        } else {
+            throw new Error("Sorry, a new block for that index has already been accepted");
+        }
+        return candidate, rewardAmount
+    }
+
+    // add a transaction to the pending trabsaction pool after validation
     addTransaction(transaction) {
         // if (!transaction.from || !transaction.to || !transaction.value || !transaction.fee || !transaction.data || !transaction.senderPubkey) {
         //     throw new Error('Sorry! Transaction is missing a value.');
@@ -92,16 +139,16 @@ export default class BlockChain {
         for (const block of this.chain) {
             for (const transaction of block.transactions) {
                 if (transaction.from === address) {
-                    balance -= transaction.value;
-                    balance -= transaction.fee;
+                    balance = math.subtract(balance, transaction.value);
+                    balance = math.subtract(balance, transaction.fee);
                 }
 
                 if (transaction.to === address) {
-                    balance += transaction.value;
+                    balance = math.add(balance, transaction.value);
                 }
 
                 if (transaction.from === "0000000000000000000000000000000000000000") {
-                    balance += transaction.fee;
+                    balance = math.add(balance, transaction.fee);
                 }
             }
         }

@@ -7,7 +7,7 @@ export default class Block {
     constructor(index, transactions, minedBy, dateCreated, previousBlockHash) {
         this.index = index;
         this.transactions = transactions;
-        this.difficulty = 2;
+        this.difficulty = 0;
         this.previousBlockHash = previousBlockHash.toString();
         this.minedBy = minedBy.toString();
         this.blockDataHash = this.calculateBlockDataHash();
@@ -23,7 +23,7 @@ export default class Block {
 
     // calculate the block hash using SHA256 which takes the blockDataHash and nonce
     calculateBlockHash() {
-        return CryptoJS.SHA256(this.blockDataHash + this.nonce).toString();
+        return CryptoJS.SHA256(this.blockDataHash + this.dateCreated + this.nonce).toString();
     }
 
     // check the validity of each transaction in the block and make sure there are no missing values
@@ -49,13 +49,13 @@ export default class Block {
         }
         const newBlockHash = this.calculateBlockHash(newBlock);
 
-        console.log("Block mined, nonce: " + this.nonce + ", hash: " + this.blockHash);
+        console.log("Block mined, nonce: " + this.nonce + ", hash: " + newBlockHash);
     }
 }
 
-// calculate the blockhash (block data hash + nonce) for outside the block class 
+// calculate the blockhash (block data hash + dateCreated + nonce) for outside the block class 
 export function calculateBlockHash(newBlock) {
-    return CryptoJS.SHA256(newBlock.blockDataHash + newBlock.nonce).toString();
+    return CryptoJS.SHA256(newBlock.blockDataHash + newBlock.dateCreated + newBlock.nonce).toString();
 }
 
 // create an accurate date in ISO format
