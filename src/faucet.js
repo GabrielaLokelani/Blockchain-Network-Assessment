@@ -18,8 +18,11 @@ export function faucetTransaction(toAddress, requestAmount) {
         const faucetTXN = new Transaction(faucetAddress, toAddress, requestAmount, 0, createDate(), "faucet tx", faucetPublicKeyComp);
         faucetTXN.signTransaction(faucetPrivKey, faucetmsg);
         MIEWCOIN_BLOCKCHAIN.pendingTransactions.push(faucetTXN);
+        return faucetTXN;
+    } else {
+        throw new Error("Sorry, either your request amount has exceeted the limit or your address is missing");
     }
-    return true;
+    
 }
 
 // create the faucet server for faucet app
@@ -41,7 +44,8 @@ export function initFaucetServer() {
             // faucetTransaction(req.body.toAddress, req.body.requestAmount);
             let toAddress = req.body.toAddress;
             let requestAmount = req.body.requestAmount;
-            faucetTransaction(toAddress, requestAmount);
+            let txn = faucetTransaction(toAddress, requestAmount);
+            res.send(`Here is your Faucet Transaction Hash: ${txn.transactionHash}`);
         });
 
     app.listen(faucetHttp_port, () => console.log('Faucet listening http on port: ' + faucetHttp_port));    

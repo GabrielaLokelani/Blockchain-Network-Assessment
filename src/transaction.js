@@ -15,12 +15,12 @@ export default class Transaction {
         this.dateCreated = dateCreated;
         this.data = data;
         this.senderPubKey = senderPubKey;
-        this.senderPrivKey = senderPrivKey;
     }
 
     // calculate the hash for the transaction using cryptoJS and SHA256
     calculateTransactionHash() {
-        return CryptoJS.SHA256(this.from + this.to + this.value + this.fee + this.dateCreated + this.data + this.senderPubKey).toString();
+        let data =  this.data.replaceAll(" ", "");
+        return CryptoJS.SHA256(this.from + this.to + this.value + this.fee + this.dateCreated + data + this.senderPubKey).toString();
     }
 
     // sign the transaction with the private key and a secret message
@@ -54,10 +54,11 @@ export default class Transaction {
 
         // verify the signature is valid
         var isValid = ec.verify(msg, signature, pubKeyRecovered);
-        console.log("Is this a valid signature?   " + isValid) 
+        console.log("Is this a valid signature?   " + isValid);
 
         // signature to DER format? ** currently not in DER format but can change with solution below :)
         // this.signature = signature.toDER('hex');
+
         // connect created signature to signature element of transaction
         this.signature = signature;
     }
@@ -75,11 +76,13 @@ export default class Transaction {
             throw new Error('No signature in this transaction');
         }
 
+        // 
         let hexToDecimal = (x) => ec.keyFromPrivate(x, "hex").getPrivate().toString(10);
         let pubKeyRecovered = ec.recoverPubKey(hexToDecimal(this.scrtMsg), this.signature, this.signature.recoveryParam, "hex");
         console.log("Recovered pubKey:", pubKeyRecovered.encodeCompressed("hex"));
 
+        // use ec verify to verify the signature with message and recovered public key
         var isValid = ec.verify(this.scrtMsg, this.signature, pubKeyRecovered);
-        console.log("Is this a valid signature from isValid() ?   " + isValid) //true
+        console.log("Is this a valid signature from isValid() ?   " + isValid); //true
     }
 }

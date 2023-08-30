@@ -174,10 +174,18 @@ export default class BlockChain {
             for (const transaction of block.transactions) {
                 if (transaction.from === address) {
                     listOfTXN = JSON.stringify(transaction);
+                    return listOfTXN;
+                } else {
+                    for (const transaction of this.pendingTransactions) {
+                        if (transaction.from === address) {
+                            listOfTXN = JSON.stringify(transaction);
+                            return ("PENDING TRNASACTION(S): " + "\n" + listOfTXN);
+                        }
+                    }
                 }
             }
-        }
-        return listOfTXN;
+        }   
+        return listOfTXN; 
     }
 
     // get specific transaction by its hash
@@ -187,6 +195,14 @@ export default class BlockChain {
             for (const transaction of block.transactions) {
                 if (transaction.transactionHash === txnHash) {
                     txn = JSON.stringify(transaction);
+                    return txn;
+                } else {
+                    for (const transaction of this.pendingTransactions) {
+                        if (transaction.transactionHash === txnHash) {
+                            txn = JSON.stringify(transaction);
+                            return ("PENDING TRNASACTION: " + "\n" + txn);
+                        }
+                    }
                 }
             }
         }
