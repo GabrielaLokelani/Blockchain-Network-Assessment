@@ -40,10 +40,12 @@ export function initHttpServer() {
         res.render('../views/wallet.html');
     });
 
+    // gets the open existing wallet html page
     app.get('/openWallet', (req, res) => {
         res.render('../views/openWallet.html');
     });
 
+    // enter a privatekey to open an exisitng wallet, if privkey is wrong an error will throw
     app.post('/openWallet', (req, res) => {
         if (req.body.privKey) {
             let openedWallet = openWallet(req.body.privKey);
@@ -52,15 +54,6 @@ export function initHttpServer() {
             throw new Error("Sorry we could not find a wallet for that private key, check to make sure it is entered correctly.")
         }
     });
-
-    // // get faucet page
-    // app.get('/faucet', (req, res) => {
-    //     res.render('../views/faucet.html');
-    // });
-
-    // app.post('/faucet', (req, res) => {
-    //     faucetTransaction(req.body.toAddress, req.body.requestAmount);
-    // });
 
     // get all blocks in the blockchain
     app.get('/blocks', (req, res) => res.send(JSON.stringify(MIEWCOIN_BLOCKCHAIN)));
@@ -129,8 +122,14 @@ export function initHttpServer() {
 
     // get the balance for a specific address 
     app.get('/address/:address/balance', (req, res) => {
-        const balance = MIEWCOIN_BLOCKCHAIN.getBalanceOfAddress(req.params.address);
-        res.send(balance.toString());
+        let confirmedBalance = MIEWCOIN_BLOCKCHAIN.getConfirmedBalanceOfAddress(req.params.address);
+        let safeBalance = MIEWCOIN_BLOCKCHAIN.getSafeBalanceOfAddress(req.params.address);
+        let pendingBalance = MIEWCOIN_BLOCKCHAIN.getPendingBalanceOfAddress(req.params.address);
+        res.send({
+            "confirmedBalance": confirmedBalance.toString(),
+            "safeBalance": safeBalance.toString(),
+            "pendingBalance": pendingBalance.toString()
+        });
     });    
 
     // get miner main page
@@ -148,7 +147,7 @@ export function initHttpServer() {
         // submit miners address and init the miner
         MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body.miningRewardAddress);
         broadcast(responseLatestMsg());
-        res.send();
+        res.redirect('/home');
     });
 
     // get mining job page (just pulls up mineNextBlock html)

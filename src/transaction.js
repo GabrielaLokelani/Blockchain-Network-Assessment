@@ -7,7 +7,7 @@ import { keyPairFromPriv } from "./wallet";
 
 // create the transaction class which each new transaaction will follow
 export default class Transaction {
-    constructor(from, to, value, fee, dateCreated, data, senderPubKey, senderPrivKey) {
+    constructor(from, to, value, fee, dateCreated, data, senderPubKey) {
         this.from = from;
         this.to = to;
         this.value = value;

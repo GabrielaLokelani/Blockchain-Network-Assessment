@@ -54,6 +54,16 @@ export default class BlockChain {
 
         let block = new Block(newIndex, this.pendingTransactions, miningRewardAddress, createDate(), latestBlock.blockHash);
 
+        let totalFees = 0;
+        for (const txn of block.transactions) {
+            totalFees =  math.add(totalFees, txn.fee);
+            console.log("total fees: " + totalFees);
+        }
+        let totalReward = math.add(totalFees, this.miningReward);
+        const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
+        minerTXN.signRewardTransaction({"r": "000000000000000000000000000000000000000000000000000000000000000000", "s": "000000000000000000000000000000000000000000000000000000000000000000"});
+        this.pendingTransactions.unshift(minerTXN);
+
         block.mineBlock(2, block);
         console.log('Block was successfully mined!');
 
@@ -61,16 +71,6 @@ export default class BlockChain {
 
         // Put the miner fee transaction into pendingTransactions for the next processing operation??? The miner fee transaction is characterized by the source account being empty.
         this.pendingTransactions = [];
-
-        // ?? should the minertxn be the fee from the txns being mined AND the reward and *** main issue rn is how to do all those txns and signing with privkeys
-        let totalFees = 0;
-        for (const txn of block.transactions) {
-            math.add(totalFees, txn.fee);
-        }
-        const totalReward = totalFees + 5000000;
-        const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
-        minerTXN.signRewardTransaction(["000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000000000000000000000000000"]);
-        this.pendingTransactions.push(minerTXN);
 
         return block;
     }
@@ -111,31 +111,24 @@ export default class BlockChain {
             if (candidateBlockHash === candidate.blockHash) {
                 MIEWCOIN_BLOCKCHAIN.addBlock(candidate);
                 this.pendingTransactions = [];
-                return candidate, rewardAmount
+                return candidate, rewardAmount;
             }
         } else {
             throw new Error("Sorry, a new block for that index has already been accepted");
         }
-        return candidate, rewardAmount
+        return candidate, rewardAmount;
     }
 
     // add a transaction to the pending trabsaction pool after validation
     addTransaction(transaction) {
-        // if (!transaction.from || !transaction.to || !transaction.value || !transaction.fee || !transaction.data || !transaction.senderPubkey) {
-        //     throw new Error('Sorry! Transaction is missing a value.');
-        // }
-        // ***!!! TURNED OFF FOR NOW WHILE SIGNING WAS CHANGED ***!!!
-        // if (!transaction.isValid()) {
-        //     throw new Error('Cannot add invalid transaction to the chain');
-        // }
-
         // push to mempool
         this.pendingTransactions.push(transaction)
     }
 
-    // get balance of an address
-    getBalanceOfAddress(address) {
+    // get pending balance of an address
+    getPendingBalanceOfAddress(address) {
         let balance = 0;
+        console.log("this is the chain length: " + this.chain.length);
         for (const block of this.chain) {
             for (const transaction of block.transactions) {
                 if (transaction.from === address) {
@@ -152,6 +145,98 @@ export default class BlockChain {
                 }
             }
         }
+        for (const transaction of this.pendingTransactions) {
+            if (transaction.from === address) {
+                balance = math.subtract(balance, transaction.value);
+                balance = math.subtract(balance, transaction.fee);
+            }
+
+            if (transaction.to === address) {
+                balance = math.add(balance, transaction.value);
+            }
+
+            if (transaction.from === "0000000000000000000000000000000000000000") {
+                balance = math.add(balance, transaction.fee);
+            }
+        }
+        return balance;
+    }
+
+    // get safe balance of an address
+    getSafeBalanceOfAddress(address) {
+        let balance = 0;
+        if (this.chain.length >= 2) {
+            for (const block of this.chain) {
+                if (block.index <= this.chain.length - 2) {
+                    for (const transaction of block.transactions) {
+                        if (transaction.from === address) {
+                            balance = math.subtract(balance, transaction.value);
+                            balance = math.subtract(balance, transaction.fee);
+                        }
+        
+                        if (transaction.to === address) {
+                            balance = math.add(balance, transaction.value);
+                        }
+        
+                        if (transaction.from === "0000000000000000000000000000000000000000") {
+                            balance = math.add(balance, transaction.fee);
+                        }
+                    }
+                }
+            }
+        }
+        return balance;
+    }
+
+        // get confirmed Balance of an address
+    getConfirmedBalanceOfAddress(address) {
+        let balance = 0;
+        if (this.chain.length >= 7) {
+            for (const block of this.chain) {
+                if (block.index <= this.chain.length - 7) {
+                    for (const transaction of block.transactions) {
+                        if (transaction.from === address) {
+                            balance = math.subtract(balance, transaction.value);
+                            balance = math.subtract(balance, transaction.fee);
+                        }
+        
+                        if (transaction.to === address) {
+                            balance = math.add(balance, transaction.value);
+                        }
+        
+                        if (transaction.from === "0000000000000000000000000000000000000000") {
+                            balance = math.add(balance, transaction.fee);
+                        }
+                    }
+                }
+            }
+        }
+        return balance;
+    }
+
+    // get confirmed Balance of an address
+    getConfirmedBalanceOfAddress(address) {
+        let balance = 0;
+        if (this.chain.length >= 7) {
+            for (const block of this.chain) {
+                if (block.index <= this.chain.length - 7) {
+                    for (const transaction of block.transactions) {
+                        if (transaction.from === address) {
+                            balance = math.subtract(balance, transaction.value);
+                            balance = math.subtract(balance, transaction.fee);
+                        }
+        
+                        if (transaction.to === address) {
+                            balance = math.add(balance, transaction.value);
+                        }
+        
+                        if (transaction.from === "0000000000000000000000000000000000000000") {
+                            balance = math.add(balance, transaction.fee);
+                        }
+                    }
+                }
+            }
+        }
         return balance;
     }
 
@@ -161,7 +246,6 @@ export default class BlockChain {
         for (const block of this.chain) {
             if (block.transactions != null) {
                 listOfTXN = JSON.stringify(block.transactions);
-                // return block.transactions;
             }
         }
         return listOfTXN;
