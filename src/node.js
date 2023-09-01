@@ -38,7 +38,7 @@ export default class Node {
 }
 
 let node = new Node(`http://127.0.0.1:${http_port}/`, `http://127.0.0.1:${p2p_port}/`, sockets, "6f744571155652ae36dafbb6272f7949eae93369325e5e34da72d07e6d8bce1c");
-console.log(node);
+// console.log(node);
 
 // create the P2P server to let nodes interact
 export let initP2PServer = () => {
@@ -61,9 +61,6 @@ let handleBlockchainResponse = (message) => {
             return a.index - b.index;
         });
     }
-    // let receivedBlocks = JSON.parse(message.data).sort(function(a, b) { 
-    //     return a.index - b.index;
-    // });
     let latestBlockReceived = receivedBlocks[receivedBlocks.length - 1];
     let latestBlockHeld = MIEWCOIN_BLOCKCHAIN.getBlock(MIEWCOIN_BLOCKCHAIN.getHeight());
     if (latestBlockReceived.index > latestBlockHeld.index) {

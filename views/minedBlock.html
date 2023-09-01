@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="../public/index.css">
+        <title>mined block</title>
+    </head>
+    <body>
+        <div class="contrainer">
+            <nav class="navbar navbar-default">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="/home">MiewCoin Blockchain Network</a>
+                    </div>
+                    <ul class="nav navbar-nav">
+                        <li><a href="/miner">Miner</a></li>
+                        <li><a href="/minePendingTransactions">MineNextBlock</a></li>
+                        <li class="active"><a href="/getMiningJob/:minerAddress">getMiningJob</a></li>
+                        <li><a href="/submitMinedBlock">submitMinedBlock</a></li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="row">
+                <div class="jumbotron col-sm-12">
+
+                    <div class="col-sm-3">
+                        <img src="https://img.freepik.com/premium-vector/funny-cartoon-cat-cute-cat-playing-wearing-construction-hat_224300-85.jpg?w=300" alt="kittyminer"/>
+                    </div>
+                    
+                    <div class="col-sm-7">
+                        <h1 class="display-3">Welcome to the Miewcoin Blockchain Network Miner!</h1>
+                    
+                        <hr class="my-4">
+                    
+                        <h3>Great work Miner, here are the details regarding your new mined block!</h3>
+
+                        <hr class="my-4">
+
+                        <h3>New Mined Block Information:</h3>
+
+                        <p> <%= minedBlockInfo %>  </p>
+
+                    </div>
+                </div>
+            </div>
+                <div class="credits">
+                    <footer>
+                        Icon made by [Ghagra] from www.freePik.com
+                    </footer>
+                </div>
+        </div>
+    </body>
+</html>

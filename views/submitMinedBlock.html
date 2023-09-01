@@ -17,7 +17,7 @@
                     <ul class="nav navbar-nav">
                         <li><a href="/miner">Miner</a></li>
                         <li><a href="/minePendingTransactions">MineNextBlock</a></li>
-                        <li><a href="/getMiningJob">getMiningJob</a></li>
+                        <li><a href="/getMiningJob/:minerAddress">getMiningJob</a></li>
                         <li class="active"><a href="/submitMinedBlock">submitMinedBlock</a></li>
                     </ul>
                 </div>
@@ -34,20 +34,26 @@
                     
                         <hr class="my-4">
                     
-                        <h3>Good work Miner, now let's put it to the test!</h3>
+                        <h3>Now let's put your hard work to the test!</h3>
 
                         <hr class="my-4">
 
-                        <p>Submit your mined block and hopefully it will be accepted onto the chain!</p>
+                        <p>Submit your mined block data points and hopefully it will be accepted onto the chain!</p>
 
                         <form class="row" method="post" enctype="application/x-www-form-urlencoded">
 
                             <div class="col-md-6 mb-3">
 
-                                <!-- Message input -->
-                                <div class="form-outline mb-8">
-                                    <label class="form-label" for="newBlock">Enter New Block</label>
-                                    <textarea class="form-control" id="newBlock" name="newBlock" rows="8"></textarea>                                 
+                                <div class="form-group">
+                                    <label>Mined Block Hash:  <input type="text" class="form-control" name="blockHash" id="blockHash" ></label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Date Created:  <input type="text" class="form-control" name="dateCreated" id="dateCreated" ></label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Nonce:  <input type="text" class="form-control" name="nonce" id="nonce" ></label>
                                 </div>
 
                                 <div class="form-group">

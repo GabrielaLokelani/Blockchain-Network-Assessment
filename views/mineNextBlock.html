@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="../public/index.css">
+        <script src="../index.js"></script>
         <title>mineNextBlock</title>
     </head>
     <body>
@@ -17,7 +18,7 @@
                     <ul class="nav navbar-nav">
                         <li><a href="/miner">Miner</a></li>
                         <li><a href="/minePendingTransactions">MineNextBlock</a></li>
-                        <li class="active"><a href="/getMiningJob">getMiningJob</a></li>
+                        <li class="active"><a href="/getMiningJob/:minerAddress">getMiningJob</a></li>
                         <li><a href="/submitMinedBlock">submitMinedBlock</a></li>
                     </ul>
                 </div>
@@ -38,15 +39,23 @@
 
                         <hr class="my-4">
 
-                        <p>After adding your address, put in your hard work to get the next block mined!</p>
+                        <h3>After adding your address, put in your hard work to get the next block mined!</h3>
+
+                        <hr class="my-4">
+
+                        <h3>Block Candidate Information:</h3>
+
+                        <p> <%= blockCandidateInfo %>  </p> 
+
+                        <hr class="my-4">
+
+                        <h3>Block Candidate:</h3>
+
+                        <p> <%= blockCandidate %>  </p>
 
                         <form class="row" method="post" enctype="application/x-www-form-urlencoded">
 
                             <div class="col-md-6 mb-3">
-                                <div class="form-group">
-                                    <label>Enter your Address:  <input type="text" class="form-control" name="miningRewardAddress" id="miningRewardAddress" required></label>
-                                </div>
-
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary" value="Mine">Mine</button>
                                 </div>
@@ -61,5 +70,6 @@
                     </footer>
                 </div>
         </div>
+        <script src="../index.js"></script>
     </body>
 </html>

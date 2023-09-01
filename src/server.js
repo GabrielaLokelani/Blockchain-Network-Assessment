@@ -151,17 +151,28 @@ export function initHttpServer() {
     });
 
     // get mining job page (just pulls up mineNextBlock html)
-    app.get('/getMiningJob', (req, res) => {
-        res.render('../views/mineNextBlock.html');
+    app.get('/getMiningJob/:minerAddress', (req, res) => {
+        let blockCandidate = MIEWCOIN_BLOCKCHAIN.getMiningJob(req.params.minerAddress);
+        let transactions = blockCandidate.transactions;
+        let transactionsLength = transactions.length;
+        res.render('../views/mineNextBlock.html', { blockCandidateInfo: `{
+            index: ${blockCandidate.index},
+            transactionsIncluded: ${transactionsLength},
+            difficulty: ${blockCandidate.difficulty},
+            expectedReward: ${transactions[0].value},
+            rewardAddress: ${blockCandidate.minedBy},
+            blockDataHash: ${blockCandidate.blockDataHash}
+        }`, blockCandidate: `${JSON.stringify(blockCandidate)}` });
     });
 
     // get mining job, prepare the next block candidate for the miner
-    app.post('/getMiningJob', (req, res) => {
-        // submit miners address and get a mining job
-        if (req.body.miningRewardAddress) {
-            let blockCandidate = MIEWCOIN_BLOCKCHAIN.getMiningJob(req.body.miningRewardAddress);
-            res.send(blockCandidate);
-        }
+    app.post('/getMiningJob/:minerAddress', (req, res) => {
+        let newBlock = MIEWCOIN_BLOCKCHAIN.mineBlockCandidate();
+        res.render('../views/minedBlock.html', { minedBlockInfo: `{
+            blockHash: ${newBlock.blockHash},
+            nonce: ${newBlock.nonce},
+            dateCreated: ${newBlock.dateCreated}
+        }`, });
     });
 
     // get submit mined block candidate page
@@ -171,7 +182,7 @@ export function initHttpServer() {
 
     // post the new mined block for submission and approval to be added to the chain
     app.post('/submitMinedBlock', (req, res) => {
-        MIEWCOIN_BLOCKCHAIN.submitMinedBlock(req.body.newBlock);
+        MIEWCOIN_BLOCKCHAIN.submitMinedBlock(req.body.blockHash, req.body.dateCreated, req.body.nonce);
         broadcast(responseLatestMsg());
         res.send("Congratulations, You have successfully mined the next block in the chain!")
     });

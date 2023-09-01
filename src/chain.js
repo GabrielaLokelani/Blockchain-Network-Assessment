@@ -1,12 +1,17 @@
 // IMPORT RELEVANT LIBRARIES, VARIABLES AND FUNCTIONS
 import Block from './block';
-import { calculateBlockHash, createDate } from './block';
+import { calculateBlockHash, createDate, mineNewBlock } from './block';
 import { MIEWCOIN_BLOCKCHAIN } from '../index'
 import Transaction from './transaction';
 import { broadcast, responseLatestMsg } from "./node";
 import { faucetAddress } from "./faucetWallet";
 const CryptoJS = require('crypto-js');
-const math = require('mathjs')
+const math = require('mathjs');
+
+
+let miningJobs = new Map();
+let map1 = new Map();
+let storedBlock;
 
 export default class BlockChain {
     constructor() {
@@ -17,7 +22,7 @@ export default class BlockChain {
 
     // create the genesis block to start the chain
     creationOfGenesisBlock() {
-        return new Block(0, [{
+        let genesisBlock = new Block(0, [{
             "from": "0000000000000000000000000000000000000000",
             "to": faucetAddress,
             "value": 1000000000000, "fee": 0,
@@ -27,7 +32,12 @@ export default class BlockChain {
             "transactionDataHash": "2466ce78ebefb1e1f69948ade3d85d9b1beab79d724f9624ebde6b74a1cd8508",
             "signature": {"r": "000000000000000000000000000000000000000000000000000000000000000000", "s": "000000000000000000000000000000000000000000000000000000000000000000"},
             "minedInBlockIndex": 0, "transferSuccessful": true
-            }], "0000000000000000000000000000000000000000", "2023-08-22T05:30:49.694Z", '')
+            }], 0, "0000000000000000000000000000000000000000", '', "2023-08-22T05:30:49.694Z");
+            genesisBlock.nonce = 0;   
+            genesisBlock.dateCreated = "2023-08-22T05:30:49.694Z";
+            genesisBlock.blockHash = genesisBlock.calculateBlockHash();
+
+        return genesisBlock
     }
 
     // The method to get the current height of the chain (the latest added block in the chain length).
@@ -52,7 +62,7 @@ export default class BlockChain {
         const latestBlock = this.getBlock(this.getHeight());
         let newIndex = latestBlock.index + 1;
 
-        let block = new Block(newIndex, this.pendingTransactions, miningRewardAddress, createDate(), latestBlock.blockHash);
+        let block = new Block(newIndex, this.pendingTransactions, 2, miningRewardAddress, latestBlock.blockHash);
 
         let totalFees = 0;
         for (const txn of block.transactions) {
@@ -69,7 +79,7 @@ export default class BlockChain {
 
         MIEWCOIN_BLOCKCHAIN.addBlock(block);
 
-        // Put the miner fee transaction into pendingTransactions for the next processing operation??? The miner fee transaction is characterized by the source account being empty.
+        // empty out the pending transactions array
         this.pendingTransactions = [];
 
         return block;
@@ -80,36 +90,58 @@ export default class BlockChain {
         const latestBlock = this.getBlock(this.getHeight());
         let newIndex = latestBlock.index + 1;
 
-        let block = new Block(newIndex, this.pendingTransactions, miningRewardAddress, createDate(), latestBlock.blockHash);
+        let block = new Block(newIndex, this.pendingTransactions, 2, miningRewardAddress, latestBlock.blockHash);
 
         let totalFees = 0;
         for (const txn of block.transactions) {
             totalFees =  math.add(totalFees, txn.fee);
             console.log("total fees: " + totalFees);
+            txn.minedInBlockIndex = block.index;
+            txn.transferSuccessful = true;
         }
         let totalReward = math.add(totalFees, this.miningReward);
         const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
         minerTXN.signRewardTransaction({"r": "000000000000000000000000000000000000000000000000000000000000000000", "s": "000000000000000000000000000000000000000000000000000000000000000000"});
         this.pendingTransactions.unshift(minerTXN);
 
-        block.mineBlock(2, block);
-        console.log('Block was successfully mined!');
+        miningJobs.set(`${block.blockDataHash}`, `${block}`);
+        // map1.set("chicken", "rice");
+        // console.log("miningJobs: " + JSON.stringify(miningJobs));
+        // console.log(map1);
+        console.log(miningJobs.get(`${block.blockDataHash}`));
+
+        storedBlock = block;
 
         return block;
     }
 
+    getStoredBlock() {
+        return storedBlock;
+    }
+
+    mineBlockCandidate() {
+        // let block = JSON.parse(candidate);
+        let block = this.getStoredBlock();
+        block.nonce = 0;
+        block.dateCreated = createDate();
+        block.blockHash = '';
+        let minedBlock = mineNewBlock(2, block);
+        return minedBlock;
+    }
+
     // submit a new mined block 
-    submitMinedBlock(newBlock) {
-        let candidate = JSON.parse(newBlock);
+    submitMinedBlock(blockHash, dateCreated, nonce) {
+        let candidate = this.getStoredBlock();
         let rewardAmount = candidate.transactions[0].value;
-        console.log("here is the new block index for candidate: " + candidate.index);
         const latestBlock = this.getBlock(this.getHeight());
         if (candidate.index === latestBlock.index + 1) {
-            let candidateBlockHash = calculateBlockHash(candidate);
-            console.log("candidate block hash re-calculated: " + candidateBlockHash);
-            console.log("candidate block hash: " + candidate.blockHash);
-            if (candidateBlockHash === candidate.blockHash) {
+            let candidateBlockHash = calculateBlockHash(candidate.blockDataHash, dateCreated, nonce);
+            if (candidateBlockHash === blockHash) {
+                candidate.nonce = nonce;
+                candidate.dateCreated = dateCreated;
+                candidate.blockHash = blockHash
                 MIEWCOIN_BLOCKCHAIN.addBlock(candidate);
+                miningJobs.clear();
                 this.pendingTransactions = [];
                 return candidate, rewardAmount;
             }
@@ -119,10 +151,11 @@ export default class BlockChain {
         return candidate, rewardAmount;
     }
 
-    // add a transaction to the pending trabsaction pool after validation
+    // add a transaction to the pending transaction pool after validation
     addTransaction(transaction) {
-        // push to mempool
-        this.pendingTransactions.push(transaction)
+        if (transaction.from != null || transaction.to != null || transaction.senderPubKey != null) {
+            this.pendingTransactions.push(transaction);
+        }
     }
 
     // get pending balance of an address
@@ -299,16 +332,16 @@ export default class BlockChain {
             const previousBlock = this.chain[i - 1];
             // testing purposes 
             console.log('current blockhash' + currentBlock.blockHash);
-            console.log('calculated blockhash' + currentBlock.calculateBlockHash());
+            console.log('calculated blockhash' + currentBlock.calculateBlockHash(currentBlock.blockDataHash, currentBlock.dateCreated, currentBlock.nonce));
             // Check if all transactions in the block are valid.
             if (!currentBlock.checkTransactionsValidity()) {
                 return false;
             }
-            if (currentBlock.blockHash !== currentBlock.calculateBlockHash()) {
+            if (currentBlock.blockHash !== currentBlock.calculateBlockHash(currentBlock.blockDataHash, currentBlock.dateCreated, currentBlock.nonce)) {
                 console.error("hash not equal: " + JSON.stringify(currentBlock));
                 return false;
             }
-            if (currentBlock.previousBlockHash !== previousBlock.calculateBlockHash()) {
+            if (currentBlock.previousBlockHash !== previousBlock.calculateBlockHash(previousBlock.blockDataHash, previousBlock.dateCreated, previousBlock.nonce)) {
                 console.error("previous hash is not right: " + JSON.stringify(currentBlock));
                 return false;
             }
@@ -324,7 +357,7 @@ export default class BlockChain {
         } else if (previousBlock.blockHash !== newBlock.previousBlockHash) {
             console.log('invalid previous Hash');
             return false;
-        } else if (calculateBlockHash(newBlock) !== newBlock.blockHash) {
+        } else if (calculateBlockHash(newBlock.blockDataHash, newBlock.dateCreated, newBlock.nonce) !== newBlock.blockHash) {
             return false;
         }
         return true;
