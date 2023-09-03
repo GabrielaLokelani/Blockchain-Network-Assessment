@@ -50,7 +50,7 @@ Lets get this Meowchain going, don't stop meowing!!!
 
 **HOMEPAGE**
 1. In the browser go to:
-   - [HOMEPAGE](http://127.0.0.1:5555/home) To access the homepage of the application
+   - [HOMEPAGE](http://127.0.0.1:5555/home) or `http://127.0.0.1:5555/home` To access the homepage of the application
    - From the `/home` endpoint the user can access the:
      - Block Explorer
      - Wallet
@@ -119,7 +119,7 @@ Lets get this Meowchain going, don't stop meowing!!!
   - Replace `:address` with the user's address to see their transactions
 
 **FAUCET**
-- From the homepage, the **"Faucet"** tab or in the browser go to: [FAUCETPAGE](http://127.0.0.1:7777/faucet) To access the faucet of the application
+- From the homepage, the **"Faucet"** tab or in the browser go to: [FAUCETPAGE](http://127.0.0.1:7777/faucet) or `http://127.0.0.1:7777/faucet`  To access the faucet of the application
 - The faucet allows users to gain up to 1000000 micro Miews 
 - Fill the form out:
   - Enter your Address: input the address you wish you recieve coins from the faucet
