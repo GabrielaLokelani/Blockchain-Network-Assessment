@@ -111,7 +111,8 @@ export function initHttpServer() {
 
     // get all??? balances ** need to do **
     app.get('/balances', (req, res) => {
-        res.send();
+        let balances = MIEWCOIN_BLOCKCHAIN.allBalances()
+        res.send(`"address:" ${balances.keys}, "balance:", ${balances.values}`);
     });
 
     // get all transactions for a specific address 
@@ -199,16 +200,20 @@ export function initHttpServer() {
         res.send(sockets.map(s => s._socket.remoteAddress + ':' + s._socket.remotePort));
     });
 
+    app.get('/peers/connect', (req, res) => {
+        res.render('../views/peersConnect.html');
+    })
+
     // add a peer to the network
     app.post('/peers/connect', (req, res) => {
-        connectToPeers([req.body.peer]);
+        connectToPeers([req.body.p2pPeerPort]);
         res.send();
     });
 
     // notify peers of new block ** need to do **
-    app.post('/peers/notify-new-block', (req, res) => {
-        broadcast(responseLatestMsg());
-        res.send(broadcast(responseLatestMsg()));
+    app.get('/peers/notify-new-block', (req, res) => {
+        let msg = broadcast(responseLatestMsg());
+        res.send(msg);
     });
 
     app.listen(http_port, () => console.log('Listening http on port: ' + http_port));

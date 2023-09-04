@@ -10,6 +10,7 @@ const math = require('mathjs');
 
 // create mining job mempool
 let miningJobs = new Map();
+let confirmedAddressBalance = new Map();
 
 // create the blockchain class that will hold the chain
 export default class BlockChain {
@@ -182,6 +183,8 @@ export default class BlockChain {
                 if (transaction.from === "0000000000000000000000000000000000000000") {
                     balance = math.add(balance, transaction.fee);
                 }
+
+                confirmedAddressBalance.set(`${address}`, `${balance}`);
             }
         }
         for (const transaction of this.pendingTransactions) {
@@ -197,6 +200,8 @@ export default class BlockChain {
             if (transaction.from === "0000000000000000000000000000000000000000") {
                 balance = math.add(balance, transaction.fee);
             }
+
+            confirmedAddressBalance.set(`${address}`, `${balance}`);
         }
         return balance;
     }
@@ -246,7 +251,10 @@ export default class BlockChain {
                         if (transaction.from === "0000000000000000000000000000000000000000") {
                             balance = math.add(balance, transaction.fee);
                         }
+
+                        confirmedAddressBalance.set(`${address}`, `${balance}`);
                     }
+                    confirmedAddressBalance.set(`${address}`, `${balance}`);
                 }
             }
         }
@@ -277,6 +285,17 @@ export default class BlockChain {
             }
         }
         return balance;
+    }
+
+    allBalances() {
+        // if (this.chain.length >= 7) {
+            confirmedAddressBalance.forEach((values, keys) => {
+                console.log(values, keys)
+                return keys, values
+            });
+        // } else {
+        //     return "sorry, the chain is not long enough to get any confirmed balances! Come back later :)"
+        // }
     }
 
     // get all confirmed transactions

@@ -11,7 +11,7 @@ import { MIEWCOIN_BLOCKCHAIN } from '../index';
 import { createDate } from './block';
 import { http_port } from './server';
 
-const p2p_port = process.env.P2P_PORT || 6001;
+const p2p_port = process.env.P2P_PORT || 3333;
 export const initialPeers = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
 export var sockets = [];
