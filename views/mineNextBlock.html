@@ -55,7 +55,20 @@
 
                         <form class="row" method="post" enctype="application/x-www-form-urlencoded">
 
+                            <h3>Enter the Block Data Hash of the block candidate you wish to mine:</h3>
+
+                            <hr class="my-4">
+
                             <div class="col-md-6 mb-3">
+
+                                <div class="form-group">
+                                    <label>Block Data Hash:  <input type="text" class="form-control" name="blockDataHash" id="blockDataHash" requied></label>
+                                </div>
+
+                                <!-- <div class="form-group">
+                                    <label>Mining Difficulty (must be at least 2):  <input type="number" class="form-control" name="difficulty" id="difficulty" ></label>
+                                </div> -->
+
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-primary" value="Mine">Mine</button>
                                 </div>

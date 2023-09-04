@@ -4,7 +4,7 @@ const CryptoJS = require('crypto-js');
 
 // create the block class which each new block will follow
 export default class Block {
-    constructor(index, transactions, difficulty, minedBy, previousBlockHash, dateCreated) {
+    constructor(index, transactions, difficulty, minedBy, previousBlockHash) {
         this.index = index;
         this.transactions = transactions;
         this.difficulty = difficulty;

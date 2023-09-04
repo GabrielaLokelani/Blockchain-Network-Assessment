@@ -167,12 +167,13 @@ export function initHttpServer() {
 
     // get mining job, prepare the next block candidate for the miner
     app.post('/getMiningJob/:minerAddress', (req, res) => {
-        let newBlock = MIEWCOIN_BLOCKCHAIN.mineBlockCandidate();
+        let newBlock = MIEWCOIN_BLOCKCHAIN.mineBlockCandidate(req.body.blockDataHash);
         res.render('../views/minedBlock.html', { minedBlockInfo: `{
             blockHash: ${newBlock.blockHash},
             nonce: ${newBlock.nonce},
-            dateCreated: ${newBlock.dateCreated}
-        }`, });
+            dateCreated: ${newBlock.dateCreated},
+            blockDataHash: ${newBlock.blockDataHash}
+        }` });
     });
 
     // get submit mined block candidate page
@@ -182,7 +183,7 @@ export function initHttpServer() {
 
     // post the new mined block for submission and approval to be added to the chain
     app.post('/submitMinedBlock', (req, res) => {
-        MIEWCOIN_BLOCKCHAIN.submitMinedBlock(req.body.blockHash, req.body.dateCreated, req.body.nonce);
+        MIEWCOIN_BLOCKCHAIN.submitMinedBlock(req.body.blockHash, req.body.dateCreated, req.body.nonce, req.body.blockDataHash);
         broadcast(responseLatestMsg());
         res.send("Congratulations, You have successfully mined the next block in the chain!")
     });

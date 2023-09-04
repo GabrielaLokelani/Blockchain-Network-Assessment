@@ -8,11 +8,10 @@ import { faucetAddress } from "./faucetWallet";
 const CryptoJS = require('crypto-js');
 const math = require('mathjs');
 
-
+// create mining job mempool
 let miningJobs = new Map();
-let map1 = new Map();
-let storedBlock;
 
+// create the blockchain class that will hold the chain
 export default class BlockChain {
     constructor() {
         this.chain = [this.creationOfGenesisBlock()];
@@ -95,45 +94,52 @@ export default class BlockChain {
         let totalFees = 0;
         for (const txn of block.transactions) {
             totalFees =  math.add(totalFees, txn.fee);
-            console.log("total fees: " + totalFees);
             txn.minedInBlockIndex = block.index;
             txn.transferSuccessful = true;
         }
         let totalReward = math.add(totalFees, this.miningReward);
         const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
         minerTXN.signRewardTransaction({"r": "000000000000000000000000000000000000000000000000000000000000000000", "s": "000000000000000000000000000000000000000000000000000000000000000000"});
-        this.pendingTransactions.unshift(minerTXN);
+        minerTXN.minedInBlockIndex = block.index;
+        minerTXN.transferSuccessful = true;
 
-        miningJobs.set(`${block.blockDataHash}`, `${block}`);
-        // map1.set("chicken", "rice");
-        // console.log("miningJobs: " + JSON.stringify(miningJobs));
-        // console.log(map1);
-        console.log(miningJobs.get(`${block.blockDataHash}`));
+        // check to see if there is a coinbase tx for the miner already
+        if (block.transactions[0].data != "coinbase tx" ) {
+            this.pendingTransactions.unshift(minerTXN);
+        // if there is a coinbase tx already, replace it with the new coinbase miner txn
+        } else {
+            this.pendingTransactions.splice(0, 1, minerTXN);
+        }
 
-        storedBlock = block;
+        let blockString = JSON.stringify(block)
+        miningJobs.set(`${block.blockDataHash}`, `${blockString}`);
 
         return block;
     }
 
-    getStoredBlock() {
-        return storedBlock;
-    }
-
-    mineBlockCandidate() {
-        // let block = JSON.parse(candidate);
-        let block = this.getStoredBlock();
-        block.nonce = 0;
-        block.dateCreated = createDate();
-        block.blockHash = '';
-        let minedBlock = mineNewBlock(2, block);
-        return minedBlock;
+    mineBlockCandidate(blockDataHash) {
+        if (blockDataHash != null) {
+            let block = miningJobs.get(`${blockDataHash}`);
+            block = JSON.parse(block);
+            block.nonce = 0;
+            block.dateCreated = createDate();
+            block.blockHash = '';
+            let minedBlock = mineNewBlock(2, block);
+            return minedBlock;
+        } else {
+            throw new Error("Sorry, the difficulty must be at least 2 and there must be a blockDataHash")
+        }
     }
 
     // submit a new mined block 
-    submitMinedBlock(blockHash, dateCreated, nonce) {
-        let candidate = this.getStoredBlock();
+    submitMinedBlock(blockHash, dateCreated, nonce, blockDataHash) {
+        let candidate = miningJobs.get(`${blockDataHash}`);
+        candidate = JSON.parse(candidate);
+
         let rewardAmount = candidate.transactions[0].value;
+
         const latestBlock = this.getBlock(this.getHeight());
+        console.log("Is the blockDataHash matching? ", blockDataHash === candidate.blockDataHash);
         if (candidate.index === latestBlock.index + 1) {
             let candidateBlockHash = calculateBlockHash(candidate.blockDataHash, dateCreated, nonce);
             if (candidateBlockHash === blockHash) {
