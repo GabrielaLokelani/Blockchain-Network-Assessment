@@ -15,5 +15,3 @@ initHttpServer();
 connectToPeers(initialPeers);
 initP2PServer();
 initFaucetServer();
-
-

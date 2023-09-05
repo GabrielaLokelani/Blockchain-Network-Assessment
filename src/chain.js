@@ -3,7 +3,7 @@ import Block from './block';
 import { calculateBlockHash, createDate, mineNewBlock } from './block';
 import { MIEWCOIN_BLOCKCHAIN } from '../index'
 import Transaction from './transaction';
-import { broadcast, responseLatestMsg } from "./node";
+import { broadcast, responseLatestMsg} from "./node";
 import { faucetAddress } from "./faucetWallet";
 const CryptoJS = require('crypto-js');
 const math = require('mathjs');
@@ -90,7 +90,7 @@ export default class BlockChain {
         const latestBlock = this.getBlock(this.getHeight());
         let newIndex = latestBlock.index + 1;
 
-        let block = new Block(newIndex, this.pendingTransactions, 2, miningRewardAddress, latestBlock.blockHash);
+        let block = new Block(newIndex, this.pendingTransactions, 5, miningRewardAddress, latestBlock.blockHash);
 
         let totalFees = 0;
         for (const txn of block.transactions) {
@@ -119,13 +119,13 @@ export default class BlockChain {
     }
 
     mineBlockCandidate(blockDataHash) {
-        if (blockDataHash != null) {
+        if (blockDataHash != undefined) {
             let block = miningJobs.get(`${blockDataHash}`);
             block = JSON.parse(block);
             block.nonce = 0;
             block.dateCreated = createDate();
             block.blockHash = '';
-            let minedBlock = mineNewBlock(2, block);
+            let minedBlock = mineNewBlock(5, block);
             return minedBlock;
         } else {
             throw new Error("Sorry, the difficulty must be at least 2 and there must be a blockDataHash")
@@ -254,33 +254,8 @@ export default class BlockChain {
 
                         confirmedAddressBalance.set(`${address}`, `${balance}`);
                     }
+                    console.log("Where should I put this???")
                     confirmedAddressBalance.set(`${address}`, `${balance}`);
-                }
-            }
-        }
-        return balance;
-    }
-
-    // get confirmed Balance of an address
-    getConfirmedBalanceOfAddress(address) {
-        let balance = 0;
-        if (this.chain.length >= 7) {
-            for (const block of this.chain) {
-                if (block.index <= this.chain.length - 7) {
-                    for (const transaction of block.transactions) {
-                        if (transaction.from === address) {
-                            balance = math.subtract(balance, transaction.value);
-                            balance = math.subtract(balance, transaction.fee);
-                        }
-        
-                        if (transaction.to === address) {
-                            balance = math.add(balance, transaction.value);
-                        }
-        
-                        if (transaction.from === "0000000000000000000000000000000000000000") {
-                            balance = math.add(balance, transaction.fee);
-                        }
-                    }
                 }
             }
         }
@@ -289,9 +264,11 @@ export default class BlockChain {
 
     allBalances() {
         // if (this.chain.length >= 7) {
-            confirmedAddressBalance.forEach((values, keys) => {
-                console.log(values, keys)
-                return keys, values
+            confirmedAddressBalance.forEach((values, key, map) => {
+                console.log("this is the values and keys for the balance" , values, key, map)
+                let address = key;
+                let balance = confirmedAddressBalance.get(`${address}`);
+                return address, balance
             });
         // } else {
         //     return "sorry, the chain is not long enough to get any confirmed balances! Come back later :)"

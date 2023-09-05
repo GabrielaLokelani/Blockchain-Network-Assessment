@@ -35,15 +35,16 @@ Lets get this Meowchain going, don't stop meowing!!!
    - Check to make sure dependencies got installed
 2. To get the application started, run the first or "main" node
    - Open the command line to start the main node with the http port: 5555, faucet port: 7777, and p2p port: 3333
-     - Run `HTTP_PORT=5555 P2P_PORT=3333 FAUCET_PORT=7777 npm start`
-   - The http and faucet ports are already pre-set for this main node, so the p2p port may be some other number above 3000
+     - Run `HTTP_PORT=5555 P2P_PORT=3333 FAUCET_PORT=7777 npm start` or simply `npm start`
+   - The http and faucet ports are already pre-set for this main node
 3. To start other nodes from the console
    - Open a new separate terminal in the project file path 
    - Pick three new port numbers that are different from the ports in use for the main node for the other node's http, p2p, and faucet port
-   - Now to connect to a seperate node also include the Websocket connection
+   - To connect to a seperate node while starting the new node, also include the Websocket connection
      - `PEERS=ws://localhost:{p2p port of the node you wish to connect to}`
    - For example: 
      - Run `HTTP_PORT=6666 P2P_PORT=4444 FAUCET_PORT=8888 PEERS=ws://localhost:3333 npm start`
+   - Alternatively, the user may connect to a node though the `/peers/connect` endpoint
 
 
 ### Usage Instructions
@@ -84,6 +85,10 @@ Lets get this Meowchain going, don't stop meowing!!!
   - Replace `:address` with the address of the user whom transactions you wish to see
 - The **"Peers"** tab or `/peers` endpoint
   - This leads to a page where the user can see the peers array and which peers are connected
+- The **"Connect To Peers"** tab or `/peers/connect` endpoint
+  - This leads to a page where the user can enter the p2p port of the peer they wish to connect to
+  - Entering the p2p port should be in this format:
+    - `ws://localhost:{p2p port}` in example: `ws://localhost:3333`
 
 **WALLET**
 - From the homepage, the Wallet tab or or `/wallet` endpoint will lead to the wallet hub

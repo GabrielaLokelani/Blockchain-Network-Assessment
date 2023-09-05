@@ -7,13 +7,16 @@ const express = require('express');
 const WebSocket = require('ws');
 const path = require('path')
 const bodyParser = require('body-parser');
-import { MIEWCOIN_BLOCKCHAIN } from '../index';
+import { MIEWCOIN_BLOCKCHAIN } from '../index'
 import { createDate } from './block';
 import { http_port } from './server';
 
 const p2p_port = process.env.P2P_PORT || 3333;
 export const initialPeers = process.env.PEERS ? process.env.PEERS.split(',') : [];
 
+export let nodeMap = new Map();
+export let peerMap = new Map();
+export var peerPool = [];
 export var sockets = [];
 export let MessageType = {
     QUERY_LATEST: 0,
@@ -37,14 +40,21 @@ export default class Node {
     }
 }
 
-let node = new Node(`http://127.0.0.1:${http_port}/`, `http://127.0.0.1:${p2p_port}/`, sockets, "6f744571155652ae36dafbb6272f7949eae93369325e5e34da72d07e6d8bce1c");
-// console.log(node);
+export function createNode() {
+    let node = new Node(`http://localhost:${http_port}`, `http://localhost:${p2p_port}`, peerPool, "6f744571155652ae36dafbb6272f7949eae93369325e5e34da72d07e6d8bce1c");
+    console.log("Here is the node after creation: ", node);
+    let nodeString = JSON.stringify(node);
+    nodeMap.set(`${node.nodeID}`, `${nodeString}`);
+    return node
+}
+
+export let node = createNode()
 
 // create the P2P server to let nodes interact
 export let initP2PServer = () => {
     let server = new WebSocket.Server({port: p2p_port});
     server.on('connection', ws => initConnection(ws));
-    console.log('listening websocket p2p port on: ' + p2p_port);
+    console.log('Listening websocket p2p on port: ' + p2p_port);
 
 };
 
@@ -72,7 +82,6 @@ let handleBlockchainResponse = (message) => {
         } else if (receivedBlocks.length === 1) {
             console.log("We have to query the chain from our peer");
             broadcast(queryAllMsg());
-            // console.log("here are the received blocks:   " + JSON.stringify(receivedBlocks))
         } else {
             console.log("Received blockchain is longer than current blockchain");
             MIEWCOIN_BLOCKCHAIN.replaceChain(receivedBlocks);
@@ -104,25 +113,43 @@ var initErrorHandler = (ws) => {
     var closeConnection = (ws) => {
         console.log('connection failed to peer: ' + ws.url);
         sockets.splice(sockets.indexOf(ws), 1);
+        peerPool.splice(peerPool.indexOf(ws), 1);
     };
     ws.on('close', () => closeConnection(ws));
     ws.on('error', () => closeConnection(ws));
 };
 
-let initConnection = (ws) => {
+let initConnection = (ws, nodeID) => {
     sockets.push(ws);
+    if (ws.url){
+        addToPeerPool(ws.url, nodeID);
+    }
     initMessageHandler(ws);
     initErrorHandler(ws);
     write(ws, queryChainLengthMsg());
 };
 
-export let connectToPeers = (newPeers) => {
+function addToPeerPool(wsURL, nodeID) {
+    wsURL = wsURL.substring(2);
+    let str = "https"
+    let p2p = str.concat(wsURL);
+    peerMap.set(`${nodeID}`, `${p2p}`);
+    let connection = {
+        NodeId: nodeID,
+        P2P_Port: p2p
+    }
+    peerPool.push(connection);
+}
+
+export let connectToPeers = (newPeers, nodeID) => {
     newPeers.forEach((peer) => {
         let ws = new WebSocket(peer);
-        ws.on('open', () => initConnection(ws));
+        console.log("Peer is being connected: ", peer);
+        ws.on('open', () => initConnection(ws, nodeID));
         ws.on('error', () => {
             console.log('connection failed')
         });
+        return peer
     });
 };
 

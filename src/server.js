@@ -9,9 +9,9 @@ import BlockChain from "./chain";
 import Transaction from "./transaction";
 import { createDate } from './block';
 import { createWallet, openWallet } from "./wallet";
-import { sockets, broadcast, responseLatestMsg, connectToPeers} from "./node"
+import { sockets, broadcast, responseLatestMsg, connectToPeers, peerMap, getPeers, peerPool} from "./node"
 import { MIEWCOIN_BLOCKCHAIN } from '../index';
-import { faucetTransaction } from './faucet';
+// import { faucetTransaction } from './faucet';
 
 
 export const http_port = process.env.HTTP_PORT || 5555;
@@ -29,6 +29,10 @@ export function initHttpServer() {
     app.get('/home', (req, res) => {
         res.render('../views/home.html');
     });
+
+    app.get('/info', (req, res) => {
+        res.send();
+    })
 
     // get block explorer page
     app.get('/blockExplorer', (req, res) => {
@@ -112,7 +116,7 @@ export function initHttpServer() {
     // get all??? balances ** need to do **
     app.get('/balances', (req, res) => {
         let balances = MIEWCOIN_BLOCKCHAIN.allBalances()
-        res.send(`"address:" ${balances.keys}, "balance:", ${balances.values}`);
+        res.send(balances);
     });
 
     // get all transactions for a specific address 
@@ -197,17 +201,19 @@ export function initHttpServer() {
 
     // get array of connected peers
     app.get('/peers', (req, res) => {
-        res.send(sockets.map(s => s._socket.remoteAddress + ':' + s._socket.remotePort));
+        // let socketMap = sockets.map(s => s._socket.remoteAddress + ':' + s._socket.remotePort);
+        res.status(200).send(peerPool);
     });
 
+    // get the peersConnect page and form to fill out
     app.get('/peers/connect', (req, res) => {
         res.render('../views/peersConnect.html');
     })
 
     // add a peer to the network
     app.post('/peers/connect', (req, res) => {
-        connectToPeers([req.body.p2pPeerPort]);
-        res.send();
+        let peer = connectToPeers([req.body.p2pPeerPort], req.body.nodeID);
+        res.redirect("/peers");
     });
 
     // notify peers of new block ** need to do **
@@ -217,8 +223,4 @@ export function initHttpServer() {
     });
 
     app.listen(http_port, () => console.log('Listening http on port: ' + http_port));
-}
-
-function drawView(res, view, data) {
-    res.render('../views/' + view + '.html', data)
 }
