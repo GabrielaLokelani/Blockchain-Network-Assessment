@@ -9,8 +9,8 @@ const CryptoJS = require('crypto-js');
 const math = require('mathjs');
 
 // create mining job mempool
-let miningJobs = new Map();
-let confirmedAddressBalance = new Map();
+export let miningJobs = new Map();
+export let confirmedAddressBalance = new Map();
 
 // create the blockchain class that will hold the chain
 export default class BlockChain {
@@ -168,7 +168,6 @@ export default class BlockChain {
     // get pending balance of an address
     getPendingBalanceOfAddress(address) {
         let balance = 0;
-        console.log("this is the chain length: " + this.chain.length);
         for (const block of this.chain) {
             for (const transaction of block.transactions) {
                 if (transaction.from === address) {
@@ -211,7 +210,7 @@ export default class BlockChain {
         let balance = 0;
         if (this.chain.length >= 2) {
             for (const block of this.chain) {
-                if (block.index <= this.chain.length - 2) {
+                if (block.index <= this.chain.length - 1) {
                     for (const transaction of block.transactions) {
                         if (transaction.from === address) {
                             balance = math.subtract(balance, transaction.value);
@@ -232,17 +231,18 @@ export default class BlockChain {
         return balance;
     }
 
-        // get confirmed Balance of an address
+    // get confirmed Balance of an address
     getConfirmedBalanceOfAddress(address) {
         let balance = 0;
         if (this.chain.length >= 7) {
             for (const block of this.chain) {
-                if (block.index <= this.chain.length - 7) {
+                if (block.index <= this.chain.length - 6) {
                     for (const transaction of block.transactions) {
                         if (transaction.from === address) {
                             balance = math.subtract(balance, transaction.value);
                             balance = math.subtract(balance, transaction.fee);
                         }
+                        console.log("This balance first round ", balance);
         
                         if (transaction.to === address) {
                             balance = math.add(balance, transaction.value);
@@ -263,27 +263,33 @@ export default class BlockChain {
     }
 
     allBalances() {
-        // if (this.chain.length >= 7) {
-            confirmedAddressBalance.forEach((values, key, map) => {
-                console.log("this is the values and keys for the balance" , values, key, map)
-                let address = key;
-                let balance = confirmedAddressBalance.get(`${address}`);
-                return address, balance
-            });
-        // } else {
-        //     return "sorry, the chain is not long enough to get any confirmed balances! Come back later :)"
-        // }
+        if (this.chain.length >= 7) {
+            let confirmedTxnArray = this.getConfirmedTransactions();
+            confirmedTxnArray.forEach((value, index) => {
+                this.getConfirmedBalanceOfAddress(value.to);
+                this.getConfirmedBalanceOfAddress(value.from);
+            })
+        } else {
+            return "Sorry, the chain is not long enough to get any confirmed balances! Come back later :)"
+        }
+        return [...confirmedAddressBalance.entries()];
     }
 
     // get all confirmed transactions
     getConfirmedTransactions() {
-        let listOfTXN = "";
-        for (const block of this.chain) {
-            if (block.transactions != null) {
-                listOfTXN = JSON.stringify(block.transactions);
+        let confirmedTxns = [];
+        if (this.chain.length >= 7) {
+            for (const block of this.chain) {
+                if (block.index <= this.chain.length - 6) {
+                    for (const transaction of block.transactions) {
+                        confirmedTxns.push(transaction);
+                    }
+                }
             }
+        } else {
+            return "Sorry the chain must contain at least 7 blocks"
         }
-        return listOfTXN;
+        return confirmedTxns;
     }
 
     // get all transactions for a specific address 
@@ -402,3 +408,41 @@ export default class BlockChain {
     }
 
 }
+
+// confirmed transactions original
+// let listOfTXN = '';
+// for (const block of this.chain) {
+//     if (block.transactions != null) {
+//         listOfTXN = JSON.stringify(block.transactions);
+//     }
+// }
+// return listOfTXN;
+
+// attempt does not work below
+// let listOfTXN = '';
+// let txnArray = [];
+// for (const block of this.chain) {
+//     console.log("the chains length is: ", this.chain.length);
+//     console.log("the chains length minus 1 is: ", this.chain.length - 1);
+//     console.log("this is the blocks index: ", block.index);
+//     if (block.index <= this.chain.length - 1) {
+//         for (const transaction of block.transactions) {
+//             listOfTXN = JSON.stringify(transaction);
+//             txnArray.push(transaction);
+//             console.log("What does this list look like right after??: ", listOfTXN);
+//             console.log("What does this array look like right after??: ", txnArray);
+//             return listOfTXN;
+//         }
+//     }
+// }
+// console.log("here is the list of transactions", listOfTXN);
+// return listOfTXN;
+
+// original allBalances
+            // confirmedAddressBalance.forEach((values, key, map) => {
+            //     console.log("this is the values and keys for the balance" , values, key, map)
+            //     let address = key;
+            //     let balance = confirmedAddressBalance.get(`${address}`);
+            //     console.log("here is the allBalances: ", address, balance);
+            //     return address, balance
+            // });

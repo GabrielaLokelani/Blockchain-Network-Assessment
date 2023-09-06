@@ -6,10 +6,11 @@ const WebSocket = require('ws');
 const path = require('path');
 
 import BlockChain from "./chain";
+import { confirmedAddressBalance } from "./chain";
 import Transaction from "./transaction";
 import { createDate } from './block';
 import { createWallet, openWallet } from "./wallet";
-import { sockets, broadcast, responseLatestMsg, connectToPeers, peerMap, getPeers, peerPool} from "./node"
+import { sockets, broadcast, responseLatestMsg, connectToPeers, peerMap, peerPool, node} from "./node"
 import { MIEWCOIN_BLOCKCHAIN } from '../index';
 // import { faucetTransaction } from './faucet';
 
@@ -31,7 +32,7 @@ export function initHttpServer() {
     });
 
     app.get('/info', (req, res) => {
-        res.send();
+        res.send(node);
     })
 
     // get block explorer page
@@ -98,7 +99,7 @@ export function initHttpServer() {
     // send a new transaction
     app.post('/transaction/send', (req, res) => {
         // create a new transaction
-        if (req.body.fee >= 10 && req.body.from != null && req.body.to != null) {
+        if (req.body.fee >= 10 && req.body.from != null && req.body.to != null && MIEWCOIN_BLOCKCHAIN.getPendingBalanceOfAddress(req.body.from) >= (req.body.value + req.body.fee)) {
             const newTXN = new Transaction(req.body.from, req.body.to, req.body.value, req.body.fee, createDate(), req.body.data, req.body.senderPubKey);
             // sign 
             newTXN.signTransaction(req.body.senderPrivKey, req.body.scrtMsg);
@@ -108,14 +109,14 @@ export function initHttpServer() {
             console.log("Here is your new Transaction Hash: " + newTXN.transactionHash);
             res.redirect('/home');
         } else {
-            res.send("Sorry, your transaction is missing either a to or from address or the fee is less than 10 micro coins");
+            res.send("Sorry, your transaction is possibly missing an address, the fee is less than 10 micro coins, or the from address does not have enough balance");
         }
         res.send();
     });
 
     // get all??? balances ** need to do **
     app.get('/balances', (req, res) => {
-        let balances = MIEWCOIN_BLOCKCHAIN.allBalances()
+        let balances = MIEWCOIN_BLOCKCHAIN.allBalances();
         res.send(balances);
     });
 
@@ -150,7 +151,7 @@ export function initHttpServer() {
     // mine pending txns to mine the next block (all in one solution, no mining job and block candidate loading, use for testing purposes)
     app.post('/minePendingTransactions', (req, res) => {
         // submit miners address and init the miner
-        MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.body.miningRewardAddress);
+        MIEWCOIN_BLOCKCHAIN.minePendingTransactions(req.params.miningRewardAddress);
         broadcast(responseLatestMsg());
         res.redirect('/home');
     });
