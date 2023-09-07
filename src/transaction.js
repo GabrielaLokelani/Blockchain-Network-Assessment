@@ -42,10 +42,6 @@ export default class Transaction {
         this.transactionHash = this.calculateTransactionHash();
         var msg = crypto.createHash("sha256").update(scrtMsg.toString()).digest();
 
-        // const msg = CryptoJS.HmacSHA256(scrtMsg);
-        // const sign = signingKey.sign(msg, privateKey, 'base64');
-        // console.log("you have reached the signing:  " + sign);
-
         // crate signature
         var signature = ec.sign(msg, privateKey, {canonical: true});
 
@@ -70,7 +66,7 @@ export default class Transaction {
 
     isValid() {
         // if miner fee transaction fromAddress is empty, verification cannot be completed.
-        if (this.from === null) return true;
+        if (this.from === null) return false;
         // Determine if the signature exists
         if (!this.signature || this.signature.length === 0) {
             throw new Error('No signature in this transaction');
@@ -86,3 +82,7 @@ export default class Transaction {
         console.log("Is this a valid signature from isValid() ?   " + isValid); //true
     }
 }
+
+        // const msg = CryptoJS.HmacSHA256(scrtMsg);
+        // const sign = signingKey.sign(msg, privateKey, 'base64');
+        // console.log("you have reached the signing:  " + sign);

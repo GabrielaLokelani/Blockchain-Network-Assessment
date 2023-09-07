@@ -11,13 +11,15 @@ const math = require('mathjs');
 // create mining job mempool
 export let miningJobs = new Map();
 export let confirmedAddressBalance = new Map();
+const miningReward = 5000000;
+// let bigIntReward = BigInt(miningReward);
+// console.log("This is the mining reward to number again: ", Number(bigIntReward));
 
 // create the blockchain class that will hold the chain
 export default class BlockChain {
     constructor() {
         this.chain = [this.creationOfGenesisBlock()];
         this.pendingTransactions = [];
-        this.miningReward = 5000000;
     }
 
     // create the genesis block to start the chain
@@ -69,7 +71,7 @@ export default class BlockChain {
             totalFees =  math.add(totalFees, txn.fee);
             console.log("total fees: " + totalFees);
         }
-        let totalReward = math.add(totalFees, this.miningReward);
+        let totalReward = math.add(totalFees, miningReward);
         const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
         minerTXN.signRewardTransaction({"r": "000000000000000000000000000000000000000000000000000000000000000000", "s": "000000000000000000000000000000000000000000000000000000000000000000"});
         this.pendingTransactions.unshift(minerTXN);
@@ -98,7 +100,7 @@ export default class BlockChain {
             txn.minedInBlockIndex = block.index;
             txn.transferSuccessful = true;
         }
-        let totalReward = math.add(totalFees, this.miningReward);
+        let totalReward = math.add(totalFees, miningReward);
         const minerTXN = new Transaction("0000000000000000000000000000000000000000", miningRewardAddress, totalReward, 0, createDate(), "coinbase tx", "00000000000000000000000000000000000000000000000000");
         minerTXN.signRewardTransaction({"r": "000000000000000000000000000000000000000000000000000000000000000000", "s": "000000000000000000000000000000000000000000000000000000000000000000"});
         minerTXN.minedInBlockIndex = block.index;
@@ -128,7 +130,7 @@ export default class BlockChain {
             let minedBlock = mineNewBlock(5, block);
             return minedBlock;
         } else {
-            throw new Error("Sorry, the difficulty must be at least 2 and there must be a blockDataHash")
+            throw new Error("Sorry, the difficulty must be at least 5 and there must be a blockDataHash")
         }
     }
 
@@ -182,8 +184,6 @@ export default class BlockChain {
                 if (transaction.from === "0000000000000000000000000000000000000000") {
                     balance = math.add(balance, transaction.fee);
                 }
-
-                confirmedAddressBalance.set(`${address}`, `${balance}`);
             }
         }
         for (const transaction of this.pendingTransactions) {
@@ -199,8 +199,6 @@ export default class BlockChain {
             if (transaction.from === "0000000000000000000000000000000000000000") {
                 balance = math.add(balance, transaction.fee);
             }
-
-            confirmedAddressBalance.set(`${address}`, `${balance}`);
         }
         return balance;
     }
@@ -210,7 +208,7 @@ export default class BlockChain {
         let balance = 0;
         if (this.chain.length >= 2) {
             for (const block of this.chain) {
-                if (block.index <= this.chain.length - 1) {
+                if (block.index <= this.chain.length - 2) {
                     for (const transaction of block.transactions) {
                         if (transaction.from === address) {
                             balance = math.subtract(balance, transaction.value);
@@ -236,13 +234,12 @@ export default class BlockChain {
         let balance = 0;
         if (this.chain.length >= 7) {
             for (const block of this.chain) {
-                if (block.index <= this.chain.length - 6) {
+                if (block.index <= this.chain.length - 7) {
                     for (const transaction of block.transactions) {
                         if (transaction.from === address) {
                             balance = math.subtract(balance, transaction.value);
                             balance = math.subtract(balance, transaction.fee);
                         }
-                        console.log("This balance first round ", balance);
         
                         if (transaction.to === address) {
                             balance = math.add(balance, transaction.value);
@@ -254,7 +251,6 @@ export default class BlockChain {
 
                         confirmedAddressBalance.set(`${address}`, `${balance}`);
                     }
-                    console.log("Where should I put this???")
                     confirmedAddressBalance.set(`${address}`, `${balance}`);
                 }
             }
@@ -280,7 +276,7 @@ export default class BlockChain {
         let confirmedTxns = [];
         if (this.chain.length >= 7) {
             for (const block of this.chain) {
-                if (block.index <= this.chain.length - 6) {
+                if (block.index <= this.chain.length - 7) {
                     for (const transaction of block.transactions) {
                         confirmedTxns.push(transaction);
                     }
@@ -334,6 +330,26 @@ export default class BlockChain {
         return txn;
     }
 
+    getCurrentCumulativeDifficulty() {
+        // subtracting one becuase the genesis block will be 0
+        let chainLength = this.chain.length - 1;
+        // have it set to 5 because that is the fixed block difficulty
+        let currentCumulativeDifficulty = math.multiply(chainLength, 5);
+        return currentCumulativeDifficulty
+    }
+
+    isCurrentCumDiffLT(blockchainToValidate) {
+        let otherChainLength = blockchainToValidate.length - 1;
+        let otherCurrentCumulativeDifficulty = math.multiply(otherChainLength, 5);
+        let currentCumulativeDifficulty = this.getCurrentCumulativeDifficulty();
+        if (currentCumulativeDifficulty > otherCurrentCumulativeDifficulty) {
+            return false;
+        } else if (currentCumulativeDifficulty == otherCurrentCumulativeDifficulty) {
+            return false;
+        }
+        return true;
+    }
+
     isChainValid() {
         for (let i = 1; i < this.chain.length; i++) {
             const currentBlock = this.chain[i];
@@ -359,6 +375,9 @@ export default class BlockChain {
 
     // check if the new block is valid by comparing newBlock to prevBlock via index and block hashes then by recalculating the block hash
     isValidNewBlock(newBlock, previousBlock) {
+        let blockDifficulty = newBlock.difficulty;
+        let blockHashDifficulty = newBlock.blockHash.slice(0, blockDifficulty);
+
         if (previousBlock.index + 1 !== newBlock.index) {
             console.log('invalid index');
             return false;
@@ -366,7 +385,11 @@ export default class BlockChain {
             console.log('invalid previous Hash');
             return false;
         } else if (calculateBlockHash(newBlock.blockDataHash, newBlock.dateCreated, newBlock.nonce) !== newBlock.blockHash) {
+            console.log('invalid block hash');
             return false;
+        } else if (blockHashDifficulty.length < 5) {
+            console.log('block hash does not represent a difficulty of 5 or greater');
+            return false
         }
         return true;
     }
@@ -382,9 +405,15 @@ export default class BlockChain {
 
     // checks to see if the recieved chain is valid
     isValidChain(blockchainToValidate) {
+        // validate that genesis blocks match
         if (JSON.stringify(blockchainToValidate[0]) !== JSON.stringify(this.creationOfGenesisBlock())) {
             return false;
         }
+        // validate that the current cumulative difficulty is less than the recieved blockchains cumulative difficulty
+        if (this.isCurrentCumDiffLT(blockchainToValidate) == false) {
+            return false;
+        }
+        // break the recieved chain into its blocks to validate the individual blocks
         var tempBlocks = [blockchainToValidate[0]];
         for (let i = 1; i < blockchainToValidate.length; i++) {
             if (this.isValidNewBlock(blockchainToValidate[i], tempBlocks[i - 1])) {
@@ -401,6 +430,7 @@ export default class BlockChain {
         if (this.isValidChain(newBlocks) && newBlocks.length > this.chain.length) {
             console.log('recieved blockchain is valid. Replacing current blockchain with recieved blockchain');
             this.chain = newBlocks;
+            miningJobs.clear();
             broadcast(responseLatestMsg());
         } else {
             console.log('recieved blockchain is invalid');
@@ -416,26 +446,6 @@ export default class BlockChain {
 //         listOfTXN = JSON.stringify(block.transactions);
 //     }
 // }
-// return listOfTXN;
-
-// attempt does not work below
-// let listOfTXN = '';
-// let txnArray = [];
-// for (const block of this.chain) {
-//     console.log("the chains length is: ", this.chain.length);
-//     console.log("the chains length minus 1 is: ", this.chain.length - 1);
-//     console.log("this is the blocks index: ", block.index);
-//     if (block.index <= this.chain.length - 1) {
-//         for (const transaction of block.transactions) {
-//             listOfTXN = JSON.stringify(transaction);
-//             txnArray.push(transaction);
-//             console.log("What does this list look like right after??: ", listOfTXN);
-//             console.log("What does this array look like right after??: ", txnArray);
-//             return listOfTXN;
-//         }
-//     }
-// }
-// console.log("here is the list of transactions", listOfTXN);
 // return listOfTXN;
 
 // original allBalances

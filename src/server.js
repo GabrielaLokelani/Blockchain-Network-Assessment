@@ -32,7 +32,9 @@ export function initHttpServer() {
     });
 
     app.get('/info', (req, res) => {
-        res.send(node);
+        let cumulativeDiff = MIEWCOIN_BLOCKCHAIN.getCurrentCumulativeDifficulty();
+        node = JSON.stringify(node);
+        res.send(`Node: ${node}, currentCumulativeDifficulty: ${cumulativeDiff}`);
     })
 
     // get block explorer page
@@ -220,7 +222,7 @@ export function initHttpServer() {
     // notify peers of new block ** need to do **
     app.get('/peers/notify-new-block', (req, res) => {
         let msg = broadcast(responseLatestMsg());
-        res.send(msg);
+        res.send(`${msg}`);
     });
 
     app.listen(http_port, () => console.log('Listening http on port: ' + http_port));

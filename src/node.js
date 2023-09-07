@@ -7,7 +7,7 @@ const express = require('express');
 const WebSocket = require('ws');
 const path = require('path')
 const bodyParser = require('body-parser');
-import { MIEWCOIN_BLOCKCHAIN } from '../index'
+import { MIEWCOIN_BLOCKCHAIN } from '../index';
 import { createDate } from './block';
 import { http_port } from './server';
 
@@ -35,28 +35,27 @@ export default class Node {
 
     calculateNodeID() {
         let date = createDate();
-        let random = Math.floor(Math.random() * 100);
+        let random = Math.floor(Math.random() * 1000);
         return CryptoJS.SHA256(date.toString() + random.toString()).toString();
     }
 }
-
-export function createNode() {
-    let node = new Node(`http://localhost:${http_port}`, `http://localhost:${p2p_port}`, peerPool, "6f744571155652ae36dafbb6272f7949eae93369325e5e34da72d07e6d8bce1c");
-    console.log("Here is the node after creation: ", node);
-    let nodeString = JSON.stringify(node);
-    nodeMap.set(`${node.nodeID}`, `${nodeString}`);
-    return node
-}
-
-export let node = createNode()
 
 // create the P2P server to let nodes interact
 export let initP2PServer = () => {
     let server = new WebSocket.Server({port: p2p_port});
     server.on('connection', ws => initConnection(ws));
     console.log('Listening websocket p2p on port: ' + p2p_port);
-
 };
+
+export function createNode() {
+    let node = new Node(`http://localhost:${http_port}`, `http://localhost:${p2p_port}`, peerPool, "6f744571155652ae36dafbb6272f7949eae93369325e5e34da72d07e6d8bce1c");
+    // console.log("Here is the node after creation: ", node);
+    let nodeString = JSON.stringify(node);
+    nodeMap.set(`${node.nodeID}`, `${nodeString}`);
+    return node
+}
+
+export let node = createNode()
 
 // handle the blockchain and responses for the nodes when a new event occurs
 let handleBlockchainResponse = (message) => {
@@ -165,3 +164,9 @@ export let responseLatestMsg = () => ({
 
 let write = (ws, message) => ws.send(JSON.stringify(message));
 export var broadcast = (message) => sockets.forEach(socket => write(socket, message));
+
+// function getChain() {
+//     let genesisHash = MIEWCOIN_BLOCKCHAIN.chain[0].blockHash;
+//     console.log("here is the genesis hash: ", genesisHash);
+//     return genesisHash
+// }
