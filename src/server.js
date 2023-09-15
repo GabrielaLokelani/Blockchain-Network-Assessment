@@ -101,7 +101,7 @@ export function initHttpServer() {
     // send a new transaction
     app.post('/transaction/send', (req, res) => {
         // create a new transaction
-        if (req.body.fee >= 10 && req.body.from != null && req.body.to != null && MIEWCOIN_BLOCKCHAIN.getPendingBalanceOfAddress(req.body.from) >= (req.body.value + req.body.fee)) {
+        if (req.body.value > 0 && req.body.from != null && req.body.to != null && MIEWCOIN_BLOCKCHAIN.getPendingBalanceOfAddress(req.body.from) >= (req.body.value + req.body.fee)) {
             const newTXN = new Transaction(req.body.from, req.body.to, req.body.value, req.body.fee, createDate(), req.body.data, req.body.senderPubKey);
             // sign 
             newTXN.signTransaction(req.body.senderPrivKey, req.body.scrtMsg);
